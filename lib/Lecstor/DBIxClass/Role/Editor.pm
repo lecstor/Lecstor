@@ -29,7 +29,7 @@ has schema => ( isa => 'DBIx::Class::Schema', is => 'ro', required => 1 );
 
 =attr resultset
 
-  $rs = $editor->resultset;
+the resultset
 
 =cut
 
@@ -42,7 +42,7 @@ sub _build_resultset{
 
 =attr result_source
 
-  $rs = $editor->result_source;
+the resultset result_source
 
 =cut
 
@@ -52,7 +52,7 @@ sub _build_result_source{ shift->resultset->result_source }
 
 =attr result_class
 
-  $rs = $editor->result_class;
+the resultset result_class
 
 =cut
 
@@ -84,38 +84,31 @@ sub _build_row_schema{
 sub create{
     my ($self, $args) = @_;
 
-    die sprintf "Args to create must be a hash reference, not %s", ref $args
+    die sprintf "Args to create must be a hash reference, not %s", (ref $args || 'string')
         unless ref $args eq 'HASH';
 
-    my $rs = $self->resultset;
-    my $source = $self->result_source;
-    my $class = $self->result_class;
-
-    my $rels = $self->_relations($args);
-
-    $self->_process_single($rels);
+    my $rels = $self->relations($args);
+    $self->process_single($rels);
 
     my $trxn = sub{
         my $row = $self->resultset->create($rels->{column});
-        $self->_process_multi($rels, $row);
-        $self->_process_m2m($rels, $row);
+        $self->process_multi($rels, $row);
+        $self->process_m2m($rels, $row);
     };
     $self->schema->txn_do($trxn);
 
 }
 
-sub _relations{
+sub relations{
     my ($self, $args) = @_;
 
     my %rels;
-    my $source = $self->result_source;
-    my $class = $self->result_class;
 
     foreach my $field (keys %$args){
 warn "Field: $field\n";
-        if ($source->has_relationship($field)){
+        if ($self->result_source->has_relationship($field)){
 warn "  has relationship\n";
-            my $info = $source->relationship_info($field);
+            my $info = $self->result_source->relationship_info($field);
             if ($info->{attrs}{accessor} eq 'multi'){
                 $rels{multi}{$field} = {
                     info => $info,
@@ -129,11 +122,11 @@ warn "  has relationship\n";
                 };
 #                $single_rel->{$field} = $args->{$field};
             }
-        } elsif ($source->has_column($field)){
+        } elsif ($self->result_source->has_column($field)){
 warn "  has column\n";
             $rels{column}{$field} = $args->{$field};
 #            $columns->{$field} = $args->{$field};
-        } elsif (my $info = $class->_m2m_metadata->{$field}){
+        } elsif (my $info = $self->result_class->_m2m_metadata->{$field}){
 warn "  has m2m relationship\n";
             $rels{m2m}{$field} = {
                 info => $info,
@@ -147,11 +140,10 @@ warn "  has m2m relationship\n";
     return \%rels;
 }
 
-sub _process_single{
+sub process_single{
     my ($self, $rels) = @_;
 
     my $single_rels = $rels->{single};
-    my $source = $self->result_source;
 
     # add single rel relationships
     foreach my $field (keys %$single_rels){
@@ -163,7 +155,7 @@ warn "Field: $field\n";
             # value is a reference
 
         } else {
-            my $rel_rs = $source->related_source($field)->resultset;
+            my $rel_rs = $self->result_source->related_source($field)->resultset;
             my $column = $self->row_schema->{$field}{value} || $self->row_schema->{_default}{value};
             my $result = $rel_rs->find_or_create({ $column => $value });
             $rels->{column}{$field} = $result->id;
@@ -172,7 +164,7 @@ warn "Field: $field\n";
 
 }
 
-sub _process_multi{
+sub process_multi{
     my ($self, $rels, $row) = @_;
 
     my $multi_rel = $rels->{multi};
@@ -191,16 +183,15 @@ warn "Field: $field\n";
 
 }
 
-sub _process_m2m{
+sub process_m2m{
     my ($self, $rels, $row) = @_;
 
     my $m2m_rel = $rels->{m2m};
-    my $source = $self->result_source;
 
     foreach my $field (keys %$m2m_rel){
         my $m2m_info = $m2m_rel->{$field}{info}; # field: categories
         my $rel = $m2m_info->{relation};                # has_many: product_category_maps
-        my $rel_source = $source->related_source($rel); # source: Product::CategoryMap
+        my $rel_source = $self->result_source->related_source($rel); # source: Product::CategoryMap
         my $foreign_rel = $m2m_info->{foreign_relation}; # related source field: category
         my $rel_rel_rs = $rel_source->related_source($foreign_rel)->resultset; # Product::Category
         my $column = $self->row_schema->{$foreign_rel}{value} || $self->row_schema->{_default}{value};
