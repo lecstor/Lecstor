@@ -99,6 +99,42 @@ sub create{
 
 }
 
+sub update{
+    my ($self, $args, $row) = @_;
+
+    die sprintf "Args to create must be a hash reference, not %s", (ref $args || 'string')
+        unless ref $args eq 'HASH';
+
+    my $primary;
+
+    unless ($row){
+        my @primary = $self->result_source->primary_columns;
+        my $missing;
+        foreach(@primary){
+            $args->{$_}
+            ? $primary->{$_} = $args->{$_}
+            : $missing->{$_};
+        }
+        if (keys %$missing){
+           die "update requires a row or all primary keys in args hashref. Missing primary keys: %s",
+               join(', ', keys %$missing);
+        }
+    }
+
+    my $rels = $self->relations($args);
+    $self->process_single($rels);
+
+    my $trxn = sub{
+        $row ||= $self->resultset->find($primary);
+        die "could not find row matching primary keys" unless $row;
+        $row->unpdate($rels->{column});
+        $self->process_multi($rels, $row);
+        $self->process_m2m($rels, $row);
+    };
+    $self->schema->txn_do($trxn);
+
+}
+
 sub relations{
     my ($self, $args) = @_;
 
