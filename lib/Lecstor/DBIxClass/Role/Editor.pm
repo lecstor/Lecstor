@@ -94,8 +94,9 @@ sub create{
         my $row = $self->resultset->create($rels->{column});
         $self->process_multi($rels, $row);
         $self->process_m2m($rels, $row);
+        return $row;
     };
-    $self->schema->txn_do($trxn);
+    return $self->schema->txn_do($trxn);
 
 }
 
@@ -111,8 +112,8 @@ sub update{
         my @primary = $self->result_source->primary_columns;
         my $missing;
         foreach(@primary){
-            $args->{$_}
-            ? $primary->{$_} = $args->{$_}
+            $primary->{$_} = $args->{$_}
+            ? $args->{$_}
             : $missing->{$_};
         }
         if (keys %$missing){
@@ -141,34 +142,26 @@ sub relations{
     my %rels;
 
     foreach my $field (keys %$args){
-warn "Field: $field\n";
         if ($self->result_source->has_relationship($field)){
-warn "  has relationship\n";
             my $info = $self->result_source->relationship_info($field);
             if ($info->{attrs}{accessor} eq 'multi'){
                 $rels{multi}{$field} = {
                     info => $info,
                     value => $args->{$field},
                 };
-#                $multi_rel->{$field} = $args->{$field};
             } else {
                 $rels{single}{$field} = {
                     info => $info,
                     value => $args->{$field},
                 };
-#                $single_rel->{$field} = $args->{$field};
             }
         } elsif ($self->result_source->has_column($field)){
-warn "  has column\n";
             $rels{column}{$field} = $args->{$field};
-#            $columns->{$field} = $args->{$field};
         } elsif (my $info = $self->result_class->_m2m_metadata->{$field}){
-warn "  has m2m relationship\n";
             $rels{m2m}{$field} = {
                 info => $info,
                 value => $args->{$field},
             };
-#            $m2m_rel->{$field} = $args->{$field};
         } else {
             die "field $field has no relationship or column?";
         }
@@ -183,7 +176,6 @@ sub process_single{
 
     # add single rel relationships
     foreach my $field (keys %$single_rels){
-warn "Field: $field\n";
         my $info = $single_rels->{$field}{info};
         my $value = $single_rels->{$field}{value};
         if (ref $value){
@@ -206,7 +198,6 @@ sub process_multi{
     my $multi_rel = $rels->{multi};
 
     foreach my $field (keys %$multi_rel){
-warn "Field: $field\n";
         my $column = $self->row_schema->{$field}{value} || $self->row_schema->{_default}{value};
         my $add_method = 'add_to_'.$field;
         my $value = $multi_rel->{$field}{value};
