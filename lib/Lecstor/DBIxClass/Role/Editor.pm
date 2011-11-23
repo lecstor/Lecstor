@@ -94,8 +94,9 @@ sub create{
         my $row = $self->resultset->create($rels->{column});
         $self->process_multi($rels, $row);
         $self->process_m2m($rels, $row);
+        return $row;
     };
-    $self->schema->txn_do($trxn);
+    return $self->schema->txn_do($trxn);
 
 }
 
@@ -111,8 +112,8 @@ sub update{
         my @primary = $self->result_source->primary_columns;
         my $missing;
         foreach(@primary){
-            $args->{$_}
-            ? $primary->{$_} = $args->{$_}
+            $primary->{$_} = $args->{$_}
+            ? $args->{$_}
             : $missing->{$_};
         }
         if (keys %$missing){
