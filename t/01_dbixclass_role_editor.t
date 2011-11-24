@@ -6,24 +6,16 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 use lib "$FindBin::Bin/t/lib";
 
-use Data::Dumper;
+use Test::DBIx::Class;
 
 use_ok('Editor::Consumer');
 
-use Test::DBIx::Class;
 
 fixtures_ok 'editor'
     => 'installed the product fixtures from configuration files';
 
-ok my $editor = Editor::Consumer->new({
-    schema => Schema,
-    row_schema => {                 
-        _default => {               
-            key => 'id',            
-            value => 'name',
-        },
-    },
-}) => 'new editor object';
+ok my $editor = Editor::Consumer->new({ schema => Schema, })
+    => 'new editor object';
 
 #====================================================================
 note('Create a new product');
