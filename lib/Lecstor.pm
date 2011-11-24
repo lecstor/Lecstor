@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Lecstor::DBIxClass;
 {
-  $Lecstor::DBIxClass::VERSION = '0.002';
+  $Lecstor::DBIxClass::VERSION = '0.003';
 }
 
 # ABSTRACT: a collection of modules used by Lecstor in the creation of web apps
@@ -21,7 +21,7 @@ Lecstor::DBIxClass - a collection of modules used by Lecstor in the creation of 
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 DESCRIPTION
 

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Lecstor::DBIxClass;
 {
-  $Lecstor::DBIxClass::VERSION = '0.002';
+  $Lecstor::DBIxClass::VERSION = '0.003';
 }
 
 # ABSTRACT: provides classes for simplifying the use of DBIx::Class schemas
@@ -21,7 +21,7 @@ Lecstor::DBIxClass - provides classes for simplifying the use of DBIx::Class sch
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 DESCRIPTION
 
