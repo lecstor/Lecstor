@@ -5,7 +5,7 @@ use Moose::Role;
 
 requires 'resultset_name';
 
-use Data::Dumper;
+use Try::Tiny;
 
 =head1 DESCRIPTION
 
@@ -128,7 +128,7 @@ sub update{
     my $trxn = sub{
         $row ||= $self->resultset->find($primary);
         die "could not find row matching primary keys" unless $row;
-        $row->unpdate($rels->{column});
+        $row->update($rels->{column});
         $self->process_multi($rels, $row);
         $self->process_m2m($rels, $row);
     };
@@ -201,11 +201,18 @@ sub process_multi{
         my $column = $self->row_schema->{$field}{value} || $self->row_schema->{_default}{value};
         my $add_method = 'add_to_'.$field;
         my $value = $multi_rel->{$field}{value};
+        my %existing = map{ $_->id => 1 } $row->$field;
         foreach my $item ( @$value ){
-            ref $item
-            ? $row->$add_method($item)
-            : $row->$add_method({ $column => $item });
+            try{
+                my $record = ref $item
+                ? $row->$add_method($item)
+                : $row->$add_method({ $column => $item });
+                delete $existing{$record->id};
+            } catch {
+                die $_ unless /Duplicate entry/;
+            }
         }
+        $row->$field->search({ id => { 'in' => [keys %existing] }})->delete;
     }
 
 }
@@ -225,10 +232,18 @@ sub process_m2m{
         my $add_method = $m2m_info->{add_method};
         my $value = $m2m_rel->{$field}{value};
 
+        my %existing = map{ $_->id => 1 } $row->$field;
+
         foreach my $item (@$value){
             my $result = $rel_rel_rs->find_or_create({ $column => $item });
-            $row->$add_method($result);
+            delete $existing{$result->id};
+            try{
+                $row->$add_method($result);
+            } catch {
+                die $_ unless /Duplicate entry/;
+            }
         }
+        $row->$rel->search({ $foreign_rel => { 'in' => [keys %existing] }})->delete;
     }
 
 }
