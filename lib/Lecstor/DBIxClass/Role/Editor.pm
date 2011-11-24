@@ -1,6 +1,6 @@
 package Lecstor::DBIxClass::Role::Editor;
 {
-  $Lecstor::DBIxClass::Role::Editor::VERSION = '0.001';
+  $Lecstor::DBIxClass::Role::Editor::VERSION = '0.002';
 }
 use Moose::Role;
 
@@ -222,7 +222,7 @@ Lecstor::DBIxClass::Role::Editor - Role to create DBIx::Class objects
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 DESCRIPTION
 
