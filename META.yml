@@ -1,0 +1,29 @@
+---
+abstract: 'a collection of modules used by Lecstor in the creation of web apps'
+author:
+  - 'Jason Galea <lecstor@cpan.org>'
+build_requires:
+  DBD::mysql: 0
+  DBIx::Class: 0
+  DBIx::Class::Schema: 0
+  FindBin: 0
+  Moose: 0
+  Test::DBIx::Class: 0
+  Test::More: 0
+  base: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300003, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Lecstor
+requires:
+  DBIx::Class::IntrospectableM2M: 0
+  Moose::Role: 0
+  Try::Tiny: 0
+  strict: 0
+  warnings: 0
+version: 0.001

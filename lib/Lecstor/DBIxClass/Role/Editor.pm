@@ -1,4 +1,7 @@
 package Lecstor::DBIxClass::Role::Editor;
+{
+  $Lecstor::DBIxClass::Role::Editor::VERSION = '0.001';
+}
 use Moose::Role;
 
 # ABSTRACT: Role to create DBIx::Class objects
@@ -7,31 +10,9 @@ requires 'resultset_name';
 
 use Try::Tiny;
 
-=head1 DESCRIPTION
-
-This role will add a create method (and others) to the consuming class to
-enable creating database records via L<DBIx::Class> from simple hash structures.
-The intended use is to ease importing data from flat files such as csv.
-
-The degree of simplicity of using this role is directly related to the simplicity
-of the related rows to be created.
-
-The consuming class is required to provide a resultset_name method which returns
-the name of the main resultset to be used.
-
-=attr schema [required]
-
-  $schema = $editor->schema;
-
-=cut
 
 has schema => ( isa => 'DBIx::Class::Schema', is => 'ro', required => 1 );
 
-=attr resultset
-
-the resultset
-
-=cut
 
 has resultset => ( isa => 'DBIx::Class::ResultSet', is => 'ro', lazy_build => 1 );
 
@@ -40,29 +21,16 @@ sub _build_resultset{
     $self->schema->resultset($self->resultset_name);
 }
 
-=attr result_source
-
-the resultset result_source
-
-=cut
 
 has result_source => ( isa => 'DBIx::Class::ResultSource', is => 'ro', lazy_build => 1 );
 
 sub _build_result_source{ shift->resultset->result_source }
 
-=attr result_class
-
-the resultset result_class
-
-=cut
 
 has result_class => ( isa => 'Str', is => 'ro', lazy_build => 1 );
 
 sub _build_result_class{ shift->resultset->result_class }
 
-=attr row_schema
-
-=cut
 
 has row_schema => ( isa => 'HashRef', is => 'ro', lazy_build => 1 );
 
@@ -75,11 +43,6 @@ sub _build_row_schema{
     };
 }
 
-=method create
-
-  $prod = $editor->create({ title => 'Product Name' });
-
-=cut
 
 sub create{
     my ($self, $args) = @_;
@@ -249,3 +212,66 @@ sub process_m2m{
 }
 
 1;
+
+__END__
+=pod
+
+=head1 NAME
+
+Lecstor::DBIxClass::Role::Editor - Role to create DBIx::Class objects
+
+=head1 VERSION
+
+version 0.001
+
+=head1 DESCRIPTION
+
+This role will add a create method (and others) to the consuming class to
+enable creating database records via L<DBIx::Class> from simple hash structures.
+The intended use is to ease importing data from flat files such as csv.
+
+The degree of simplicity of using this role is directly related to the simplicity
+of the related rows to be created.
+
+The consuming class is required to provide a resultset_name method which returns
+the name of the main resultset to be used.
+
+=head1 ATTRIBUTES
+
+=head2 schema [required]
+
+  $schema = $editor->schema;
+
+=head2 resultset
+
+the resultset
+
+=head2 result_source
+
+the resultset result_source
+
+=head2 result_class
+
+the resultset result_class
+
+=head2 row_schema
+
+=head1 METHODS
+
+=head2 create
+
+  $prod = $editor->create({ title => 'Product Name' });
+
+=head1 AUTHOR
+
+Jason Galea <lecstor@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Jason Galea.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

@@ -1,0 +1,17 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+dist.ini
+lib/Lecstor.pm
+lib/Lecstor/DBIxClass.pm
+lib/Lecstor/DBIxClass/Role/Editor.pm
+t/01_dbixclass_role_editor.t
+t/etc/schema.pl
+t/lib/Editor/Consumer.pm
+t/lib/Editor/DB.pm
+t/lib/Editor/DB/Result/Movie.pm
+t/lib/Editor/DB/Result/Movie/Categories.pm
+t/lib/Editor/DB/Result/Movie/Category.pm
+t/lib/Editor/DB/Result/Movie/Image.pm
+t/lib/Editor/DB/Result/Movie/Type.pm
