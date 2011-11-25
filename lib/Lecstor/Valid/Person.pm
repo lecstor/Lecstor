@@ -1,7 +1,32 @@
 package Lecstor::Valid::Person;
-
 use Validation::Class;
 use Email::Valid;
+
+# ABSTRACT: validate person details
+
+=head1 SYNOPSIS
+
+    my $rules = Lecstor::Valid::Person->new(
+        params => {
+            email => 'jason@lecstor.com',
+            password => 'abc123',
+            firstname => 'Jason',
+            surname => 'Galea',
+            homephone => '12345678',
+            workphone => '23456789',
+            mobile => '0123456789',
+            fax => '34567890',
+        }
+    );
+
+    unless ($rules->validate){
+        print $rules->errors_to_string;
+        my @errors = @{$rules->error};
+        my %errors = %{$rules->error_fields};
+        my $cnt = $rules->error_count;
+    }
+
+=cut
 
 mixin NAME => {
     min_length => 1,
@@ -15,11 +40,25 @@ mixin PHONE => {
     filters    => [qw/trim strip numeric/]
 };
 
+=attr firstname
+
+length 1 to 32 characters.
+filters: trim & strip
+
+=cut
+
 field firstname => {
     mixin => 'NAME',
     label => 'Firstname',
     error => 'your firstname is invalid',
 };
+
+=attr surname
+
+length 1 to 32 characters.
+filters: trim & strip
+
+=cut
 
 field surname => {
     mixin => 'NAME',
@@ -27,6 +66,13 @@ field surname => {
     error => 'your surname is invalid',
 
 };
+
+=attr email
+
+required
+validated with L<Email::Valid>
+
+=cut
 
 field email => {
     required => 1,
@@ -39,12 +85,26 @@ field email => {
     }
 };
 
+=attr homephone
+
+length 1 to 32 characters.
+filters: trim, strip, numeric
+
+=cut
+
 field homephone => {
     mixin => 'PHONE',
     label => 'Home Phone',
     error => 'your home phone is invalid',
 
 };
+
+=attr workphone
+
+length 1 to 32 characters.
+filters: trim, strip, numeric
+
+=cut
 
 field workphone => {
     mixin => 'PHONE',
@@ -53,6 +113,13 @@ field workphone => {
 
 };
 
+=attr mobile
+
+length 1 to 32 characters.
+filters: trim, strip, numeric
+
+=cut
+
 field mobile => {
     mixin => 'PHONE',
     label => 'Mobile Phone',
@@ -60,12 +127,26 @@ field mobile => {
 
 };
 
+=attr fax
+
+length 1 to 32 characters.
+filters: trim, strip, numeric
+
+=cut
+
 field fax => {
     mixin => 'PHONE',
     label => 'Fax Number',
     error => 'your fax number is invalid',
 
 };
+
+=attr password
+
+required
+length 8 to 64 characters.
+
+=cut
 
 field password => {
     min_length => 8,
