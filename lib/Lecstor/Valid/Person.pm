@@ -76,6 +76,7 @@ validated with L<Email::Valid>
 
 field email => {
     required => 1,
+    error => 'Not a valid email address',
     validation => sub {
         my ( $self, $this, $params ) = @_;
         if ($this->{value}) {
