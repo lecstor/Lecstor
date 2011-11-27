@@ -75,12 +75,18 @@ validated with L<Email::Valid>
 =cut
 
 field email => {
-    required => 1,
-    error => 'Not a valid email address',
+#    required => 1,
+#    error => 'Not a valid email address',
+    label => 'Email',
     validation => sub {
         my ( $self, $this, $params ) = @_;
         if ($this->{value}) {
-            return Email::Valid->address($this->{value});
+#            return Email::Valid->address($this->{value});
+            my $is_valid = Email::Valid->address($this->{value});
+            return 1 if $is_valid;
+            $self->error({ name => 'email' }, 'Not a valid email address' );
+        } else {
+            $self->error({ name => 'email' }, 'Email address is required' );
         }
         return 0;
     }
@@ -153,7 +159,84 @@ field password => {
     min_length => 8,
     max_length => 64,
     required   => 1,
+    label => 'Password',
 };
 
+=attr address.name
+
+length 1 to 64 characters.
+filters: trim & strip
+
+=cut
+
+field 'address.name' => {
+    mixin => 'NAME',
+    max_length => 64,
+    label => 'Address: Name',
+};
+
+=attr address.company
+
+length 1 to 32 characters.
+filters: trim & strip
+
+=cut
+
+field 'address.company' => {
+    mixin => 'NAME',
+    label => 'Address: Company',
+};
+
+=attr address.street
+
+length 1 to 128 characters.
+filters: trim & strip
+
+=cut
+
+field 'address.street' => {
+    mixin => 'NAME',
+    max_length => 128,
+    label => 'Address: Street',
+};
+
+=attr address.suburb
+
+length 1 to 32 characters.
+filters: trim & strip
+
+=cut
+
+field 'address.suburb' => {
+    mixin => 'NAME',
+    label => 'Address: Suburb',
+};
+
+=attr address.state
+
+length 1 to 12 characters.
+filters: trim & strip
+
+=cut
+
+field 'address.state' => {
+    mixin => 'NAME',
+    max_length => 12,
+    label => 'Address: State',
+};
+
+=attr address.postcode
+
+length 4 characters.
+filters: trim & strip
+
+=cut
+
+field 'address.postcode' => {
+    mixin => 'NAME',
+    min_length => 4,
+    max_length => 4,
+    label => 'Address: Postcode',
+};
 
 1;
