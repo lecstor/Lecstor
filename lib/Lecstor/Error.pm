@@ -13,13 +13,14 @@ single string error message
 
 has error => ( isa => 'Str', is => 'ro' );
 
-=attr exception
+=attr error_fields
 
-true if the error was an exception
+a hashref of field errors where the key is the field name and values
+are arrayrefs of errors.
 
 =cut
 
-has exception => ( isa => 'Bool', is => 'ro' );
+has error_fields => ( isa => 'HashRef[ArrayRef]', is => 'ro' );
 
 __PACKAGE__->meta->make_immutable;
 
