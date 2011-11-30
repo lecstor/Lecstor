@@ -131,6 +131,7 @@ sub update{
         $row->update($rels->{column});
         $self->process_multi($rels, $row);
         $self->process_m2m($rels, $row);
+        $row->discard_changes;
     };
     $self->schema->txn_do($trxn);
 
@@ -145,9 +146,11 @@ sub relations{
         if ($self->result_source->has_relationship($field)){
             my $info = $self->result_source->relationship_info($field);
             if ($info->{attrs}{accessor} eq 'multi'){
+                my $value = $args->{$field};
+                $value = [split(/\s*,\s*/, $value)] unless ref $value eq 'ARRAY';
                 $rels{multi}{$field} = {
                     info => $info,
-                    value => $args->{$field},
+                    value => $value,
                 };
             } else {
                 $rels{single}{$field} = {
@@ -158,14 +161,19 @@ sub relations{
         } elsif ($self->result_source->has_column($field)){
             $rels{column}{$field} = $args->{$field};
         } elsif (my $info = $self->result_class->_m2m_metadata->{$field}){
+            my $value = $args->{$field};
+            $value = [split(/\s*,\s*/, $value)] unless ref $value eq 'ARRAY';
             $rels{m2m}{$field} = {
                 info => $info,
-                value => $args->{$field},
+                value => $value,
             };
         } else {
             die "field $field has no relationship or column?";
         }
     }
+#use Data::Dumper;
+#warn Dumper(\%rels);
+
     return \%rels;
 }
 

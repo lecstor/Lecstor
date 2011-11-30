@@ -3,6 +3,7 @@ use Moose;
 
 # ABSTRACT: Search Indexer based on Lucy
 
+use Lecstor::Error;
 use Lucy::Plan::Schema;
 use Lucy::Plan::FullTextType;
 use Lucy::Plan::StringType;
@@ -36,30 +37,28 @@ has index_path => ( isa => 'Str', is => 'ro', required => 1 );
 
 =cut
 
-has create => ( isa => 'Bool', is => 'ro' );
+has create => ( isa => 'Bool', is => 'ro', default => 0 );
 
 =attr truncate
 
 =cut
 
-has truncate => ( isa => 'Bool', is => 'ro' );
+has truncate => ( isa => 'Bool', is => 'ro', default => 0  );
 
 =attr indexer
 
 =cut
 
-has indexer => ( isa => 'Str', is => 'ro', lazy_build => 1 );
+has indexer => ( isa => 'Lucy::Index::Indexer', is => 'ro', lazy_build => 1 );
 
 sub _build_indexer{
     my ($self) = @_;
-    return {
-        Lucy::Index::Indexer->new(
-            index    => $self->index_path,
-            schema   => $self->schema,
-            create   => $self->create,
-            truncate => $self->truncate,
-        )
-    };
+    return Lucy::Index::Indexer->new(
+        index    => $self->index_path,
+        schema   => $self->schema,
+        create   => $self->create,
+        truncate => $self->truncate,
+    );
 }
 
 =attr schema
@@ -151,7 +150,7 @@ sub _build_list_type{
 sub add_item{
     my ($self, $doc) = @_;
     die Lecstor::Error->new( error => 'add_item needs an id' ) unless $doc->{id};
-    $self->indexer->add_item($doc);
+    $self->indexer->add_doc($doc);
 }
 
 =method update_item
