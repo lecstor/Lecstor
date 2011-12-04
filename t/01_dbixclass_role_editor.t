@@ -2,10 +2,12 @@ use strict;
 use warnings;
 use Test::More;
 
-use FindBin;
-use lib "$FindBin::Bin/lib";
+use FindBin qw($Bin);
+use lib "$Bin/lib";
 
-use Test::DBIx::Class;
+use Test::DBIx::Class {
+    config_path => [ File::Spec->splitdir($Bin), qw(etc schema) ],
+};
 
 use_ok('Editor::Consumer');
 
