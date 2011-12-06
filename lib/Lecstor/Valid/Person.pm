@@ -75,7 +75,7 @@ validated with L<Email::Valid>
 =cut
 
 field email => {
-#    required => 1,
+    required => 1,
 #    error => 'Not a valid email address',
     label => 'Email',
     validation => sub {
