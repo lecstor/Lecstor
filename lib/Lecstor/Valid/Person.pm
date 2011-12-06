@@ -75,9 +75,9 @@ validated with L<Email::Valid>
 =cut
 
 field email => {
-#    required => 1,
+    required => 1,
 #    error => 'Not a valid email address',
-    label => 'Email',
+    label => 'Email Address',
     validation => sub {
         my ( $self, $this, $params ) = @_;
         if ($this->{value}) {
