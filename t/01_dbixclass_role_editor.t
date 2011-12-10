@@ -69,5 +69,28 @@ $cats = [sort map { $_->name } $movie->categories];
 is_deeply( $cats, [qw! Action Comedy !], 'categories ok' ) or diag('Categories: '.join(', ',@$cats));
 
 #====================================================================
+note('Update product with undef values');
+
+$editor->update({
+    duration => undef,          # integer value
+    regular_price => undef,     # dec value
+    type => undef,              # belongs to
+    name => undef,              # string
+    bulky => undef,             # bool
+    categories => undef,
+    images => undef,
+}, $movie);
+
+ok $movie = ResultSet('Movie')->find($movie->id)
+  => 'movie updated';
+
+is( $movie->duration, undef, 'integer ok' );
+is( $movie->regular_price, undef, 'dec ok' );
+is( $movie->type, undef, 'belongs_to ok' );
+is( $movie->bulky, undef, 'bool ok' );
+
+is( $movie->categories, 0, 'categories ok' );
+
+#====================================================================
 
 done_testing();

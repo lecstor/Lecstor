@@ -146,11 +146,9 @@ sub relations{
         if ($self->result_source->has_relationship($field)){
             my $info = $self->result_source->relationship_info($field);
             if ($info->{attrs}{accessor} eq 'multi'){
-                my $value = $args->{$field};
-                $value = [split(/\s*,\s*/, $value)] unless ref $value eq 'ARRAY';
                 $rels{multi}{$field} = {
                     info => $info,
-                    value => $value,
+                    value => $self->split_value($args->{$field}),
                 };
             } else {
                 $rels{single}{$field} = {
@@ -161,20 +159,28 @@ sub relations{
         } elsif ($self->result_source->has_column($field)){
             $rels{column}{$field} = $args->{$field};
         } elsif (my $info = $self->result_class->_m2m_metadata->{$field}){
-            my $value = $args->{$field};
-            $value = [split(/\s*,\s*/, $value)] unless ref $value eq 'ARRAY';
             $rels{m2m}{$field} = {
                 info => $info,
-                value => $value,
+                value => $self->split_value($args->{$field}),
             };
         } else {
-            die "field $field has no relationship or column?";
+            die "field $field has no relationship or column? ".$args->{$field};
         }
     }
 #use Data::Dumper;
 #warn Dumper(\%rels);
 
     return \%rels;
+}
+
+sub split_value{
+    my ($self, $value) = @_;
+    if (defined $value){
+        $value = [split(/\s*,\s*/, $value)] unless ref $value eq 'ARRAY';
+    } else {
+        $value = [];
+    }
+    return $value;
 }
 
 sub process_single{
@@ -186,15 +192,19 @@ sub process_single{
     foreach my $field (keys %$single_rels){
         my $info = $single_rels->{$field}{info};
         my $value = $single_rels->{$field}{value};
-        if (ref $value){
+        if (defined $value){
+            if (ref $value){
 
-            # value is a reference
+                # value is a reference
 
+            } else {
+                my $rel_rs = $self->result_source->related_source($field)->resultset;
+                my $column = $self->row_schema->{$field}{value} || $self->row_schema->{_default}{value};
+                my $result = $rel_rs->find_or_create({ $column => $value });
+                $rels->{column}{$field} = $result->id;
+            }
         } else {
-            my $rel_rs = $self->result_source->related_source($field)->resultset;
-            my $column = $self->row_schema->{$field}{value} || $self->row_schema->{_default}{value};
-            my $result = $rel_rs->find_or_create({ $column => $value });
-            $rels->{column}{$field} = $result->id;
+            $rels->{column}{$field} = undef;
         }
     }
 
