@@ -146,11 +146,9 @@ sub relations{
         if ($self->result_source->has_relationship($field)){
             my $info = $self->result_source->relationship_info($field);
             if ($info->{attrs}{accessor} eq 'multi'){
-                my $value = $args->{$field};
-                $value = [split(/\s*,\s*/, $value)] unless ref $value eq 'ARRAY';
                 $rels{multi}{$field} = {
                     info => $info,
-                    value => $value,
+                    value => $self->split_value($args->{$field}),
                 };
             } else {
                 $rels{single}{$field} = {
@@ -161,20 +159,28 @@ sub relations{
         } elsif ($self->result_source->has_column($field)){
             $rels{column}{$field} = $args->{$field};
         } elsif (my $info = $self->result_class->_m2m_metadata->{$field}){
-            my $value = $args->{$field};
-            $value = [split(/\s*,\s*/, $value)] unless ref $value eq 'ARRAY';
             $rels{m2m}{$field} = {
                 info => $info,
-                value => $value,
+                value => $self->split_value($args->{$field}),
             };
         } else {
-            die "field $field has no relationship or column?";
+            die "field $field has no relationship or column? ".$args->{$field};
         }
     }
 #use Data::Dumper;
 #warn Dumper(\%rels);
 
     return \%rels;
+}
+
+sub split_value{
+    my ($self, $value) = @_;
+    if (defined $value){
+        $value = [split(/\s*,\s*/, $value)] unless ref $value eq 'ARRAY';
+    } else {
+        $value = [];
+    }
+    return $value;
 }
 
 sub process_single{
@@ -186,15 +192,22 @@ sub process_single{
     foreach my $field (keys %$single_rels){
         my $info = $single_rels->{$field}{info};
         my $value = $single_rels->{$field}{value};
-        if (ref $value){
-
-            # value is a reference
-
+        if (defined $value){
+            if (ref $value){
+                my $rel_rs = $self->result_source->related_source($field)->resultset;
+                my $result = $rel_rs->find_or_create($value);
+                $rels->{column}{$field} = $result->id;
+            } else {
+                my $rel_source = $self->result_source->related_source($field);
+                my $rel_rs = $rel_source->resultset;
+                my $column = $self->row_schema->{$field}{value} || $self->row_schema->{_default}{value};
+                my $size = $rel_source->column_info($column)->{size};
+                $value = substr($value, 0, $size) if $size;
+                my $result = $rel_rs->find_or_create({ $column => $value });
+                $rels->{column}{$field} = $result->id;
+            }
         } else {
-            my $rel_rs = $self->result_source->related_source($field)->resultset;
-            my $column = $self->row_schema->{$field}{value} || $self->row_schema->{_default}{value};
-            my $result = $rel_rs->find_or_create({ $column => $value });
-            $rels->{column}{$field} = $result->id;
+            $rels->{column}{$field} = undef;
         }
     }
 
@@ -210,19 +223,33 @@ sub process_multi{
         my $add_method = 'add_to_'.$field;
         my $value = $multi_rel->{$field}{value};
         my %existing = map{ $_->id => 1 } $row->$field;
+
+        my $rel_source = $self->result_source->related_source($field);
+        my $size = $rel_source->column_info($column)->{size};
+
         foreach my $item ( @$value ){
             try{
-                my $record = ref $item
-                ? $row->$add_method($item)
-                : $row->$add_method({ $column => $item });
+                my $record;
+                if (ref $item){
+                    $item->{$column} = substr($item->{$column}, 0, $size) if $size;
+                    $record = $row->$add_method($item);
+                } else {
+                    $item = substr($item, 0, $size) if $size;
+                    $record = $row->$add_method({ $column => $item });
+                }
                 delete $existing{$record->id};
             } catch {
                 die $_ unless /Duplicate entry/;
             }
         }
-        $row->$field->search({ id => { 'in' => [keys %existing] }})->delete;
-    }
 
+        # delete existing related rows that are not in the update.
+        $row->$field->search({
+            id => { 'in' => [keys %existing] },
+            $column => { 'not in' => [ map{ ref $_ ? $_->{$column} : $_ } @$value ] },
+        })->delete;
+
+    }
 }
 
 sub process_m2m{
@@ -235,14 +262,17 @@ sub process_m2m{
         my $rel = $m2m_info->{relation};                # has_many: product_category_maps
         my $rel_source = $self->result_source->related_source($rel); # source: Product::CategoryMap
         my $foreign_rel = $m2m_info->{foreign_relation}; # related source field: category
-        my $rel_rel_rs = $rel_source->related_source($foreign_rel)->resultset; # Product::Category
+        my $rel_rel_source = $rel_source->related_source($foreign_rel);
+        my $rel_rel_rs = $rel_rel_source->resultset; # Product::Category
         my $column = $self->row_schema->{$foreign_rel}{value} || $self->row_schema->{_default}{value};
         my $add_method = $m2m_info->{add_method};
         my $value = $m2m_rel->{$field}{value};
+        my $size = $rel_rel_source->column_info($column)->{size};
 
         my %existing = map{ $_->id => 1 } $row->$field;
 
         foreach my $item (@$value){
+            $item = substr($item, 0, $size) if $size;
             my $result = $rel_rel_rs->find_or_create({ $column => $item });
             delete $existing{$result->id};
             try{

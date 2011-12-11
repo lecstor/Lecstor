@@ -16,6 +16,7 @@ __PACKAGE__->add_columns(
   'available_date'     => { data_type => 'DATE', is_nullable => 1, datetime_undef_if_invalid => 1 },
   'duration'           => { data_type => 'INT',     size =>  6, is_nullable => 1 },
   'bulky'              => { data_type => 'INT',     size =>  1, is_nullable => 1 },
+  'category'           => { data_type => 'INT',     size =>  3, is_nullable => 1 },
   'created'            => { data_type => 'DATETIME', is_nullable => 1, datetime_undef_if_invalid => 1 },
 );
 
@@ -24,6 +25,8 @@ __PACKAGE__->set_primary_key('id');
 __PACKAGE__->has_many( 'images' => 'Editor::DB::Result::Movie::Image', 'movie');
 
 __PACKAGE__->belongs_to( type => 'Editor::DB::Result::Movie::Type', undef, { join_type => 'left' } );
+
+__PACKAGE__->belongs_to( category => 'Editor::DB::Result::Movie::Category', undef, { join_type => 'left' } );
 
 __PACKAGE__->has_many('movie2categories' => 'Editor::DB::Result::Movie::Categories', 'movie');
 __PACKAGE__->many_to_many('categories' => 'movie2categories', 'category');
