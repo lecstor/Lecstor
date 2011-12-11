@@ -66,13 +66,13 @@ ok !$rules->validate => 'no check ok';
 is $rules->error_count(), 2, 'error count ok'
     or diag("Error string: ".$rules->errors_to_string);
 like $rules->errors_to_string, qr/at\-least/, 'error ok';
-like $rules->errors_to_string, qr/Not a valid email address/, 'error ok';
+like $rules->errors_to_string, qr/A valid email address is required/, 'error ok';
 
 ok !$rules->validate(qw! email password !) => 'email and password not ok';
 is $rules->error_count(), 2, 'error count ok'
     or diag("Error string: ".$rules->errors_to_string);
 like $rules->errors_to_string, qr/at\-least/, 'error ok';
-like $rules->errors_to_string, qr/Not a valid email address/, 'error ok';
+like $rules->errors_to_string, qr/A valid email address is required/, 'error ok';
 
 #====================================================================
 

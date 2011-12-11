@@ -76,18 +76,20 @@ validated with L<Email::Valid>
 
 field email => {
     required => 1,
-#    error => 'Not a valid email address',
+    error => 'A valid email address is required',
     label => 'Email Address',
     validation => sub {
         my ( $self, $this, $params ) = @_;
-        if ($this->{value}) {
+        return Email::Valid->address($this->{value});
+
+#        if ($this->{value}) {
 #            return Email::Valid->address($this->{value});
-            my $is_valid = Email::Valid->address($this->{value});
-            return 1 if $is_valid;
-            $self->error({ name => 'email' }, 'Not a valid email address' );
-        } else {
-            $self->error({ name => 'email' }, 'Email address is required' );
-        }
+#            my $is_valid = Email::Valid->address($this->{value});
+#            return 1 if $is_valid;
+#            $self->error({ name => 'email' }, 'Not a valid email address' );
+#        } else {
+#            $self->error({ name => 'email' }, 'Email address is required' );
+#        }
         return 0;
     }
 };
