@@ -3,12 +3,7 @@ use Moose::Role;
 
 # ABSTRACT: provides access to a DBIx::Class::ResultSet metadata
 
-has resultset => ( isa => 'DBIx::Class::ResultSet', is => 'ro', lazy_build => 1 );
-
-sub _build_resultset{
-    my ($self) = @_;
-    $self->schema->resultset($self->resultset_name);
-}
+requires 'resultset';
 
 =attr result_source
 
