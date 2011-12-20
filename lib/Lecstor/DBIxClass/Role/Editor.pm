@@ -147,12 +147,12 @@ sub relations{
             my $info = $self->result_source->relationship_info($field);
             if ($info->{attrs}{accessor} eq 'multi'){
                 $rels{multi}{$field} = {
-                    info => $info,
+#                    info => $info,
                     value => $self->split_value($args->{$field}),
                 };
             } else {
                 $rels{single}{$field} = {
-                    info => $info,
+#                    info => $info,
                     value => $args->{$field},
                 };
             }
@@ -190,7 +190,7 @@ sub process_single{
 
     # add single rel relationships
     foreach my $field (keys %$single_rels){
-        my $info = $single_rels->{$field}{info};
+#        my $info = $single_rels->{$field}{info};
         my $value = $single_rels->{$field}{value};
         if (defined $value){
             if (ref $value){
