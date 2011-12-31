@@ -13,7 +13,7 @@ __PACKAGE__->add_columns(
   'firstname'        => { data_type => 'VARCHAR', size =>  32, is_nullable => 1 },
   'surname'          => { data_type => 'VARCHAR', size =>  32, is_nullable => 1 },
   'billing_address'  => { data_type => 'INT', is_nullable => 1 },
-  'delivery_address' => { data_type => 'INT', is_nullable => 1 },
+  'default_delivery' => { data_type => 'INT', is_nullable => 1 },
   'active'           => { data_type => 'INT', is_nullable => 1, default_value => 1 },
   'email'            => { data_type => 'VARCHAR', size => 128, is_nullable => 1 },
   'homephone'        => { data_type => 'VARCHAR', size =>  32, is_nullable => 1 },
@@ -28,12 +28,11 @@ __PACKAGE__->add_columns(
 __PACKAGE__->set_primary_key('id');
 
 __PACKAGE__->belongs_to( billing_address  => 'Lecstor::Schema::Result::BillingAddress'    );
-__PACKAGE__->belongs_to( delivery_address => 'Lecstor::Schema::Result::DeliveryAddress'    );
 
 #__PACKAGE__->has_many(person2role_maps => 'Person::MapRole', 'person');
 #__PACKAGE__->many_to_many(roles => 'person2role_maps', 'role');
 
-#__PACKAGE__->has_many  ( delivery_addresses => 'Person::DeliveryAddress',    'person' );
+__PACKAGE__->has_many  ( delivery_addresses => 'Lecstor::Schema::Result::DeliveryAddress',    'person' );
 
 #__PACKAGE__->add_unique_constraint(['email']);
 
