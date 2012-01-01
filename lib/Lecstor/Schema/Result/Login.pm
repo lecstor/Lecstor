@@ -42,6 +42,13 @@ __PACKAGE__->belongs_to( person => 'Lecstor::Schema::Result::Person'    );
 
 #__PACKAGE__->might_have( temp_pass => 'Person::TempPass', 'person' );
 
+sub inflate_result {
+    my $self = shift;
+    my $ret = $self->next::method(@_);
+    return unless $ret;
+    return Lecstor::Model::Login->new( data => $ret );
+}
+ 
 
 =attr id
 
