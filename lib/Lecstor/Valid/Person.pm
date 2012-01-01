@@ -81,15 +81,6 @@ field email => {
     validation => sub {
         my ( $self, $this, $params ) = @_;
         return Email::Valid->address($this->{value});
-
-#        if ($this->{value}) {
-#            return Email::Valid->address($this->{value});
-#            my $is_valid = Email::Valid->address($this->{value});
-#            return 1 if $is_valid;
-#            $self->error({ name => 'email' }, 'Not a valid email address' );
-#        } else {
-#            $self->error({ name => 'email' }, 'Email address is required' );
-#        }
         return 0;
     }
 };

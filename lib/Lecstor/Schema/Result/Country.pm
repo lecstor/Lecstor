@@ -11,15 +11,12 @@ __PACKAGE__->table('country');
 __PACKAGE__->add_columns(
   'id'         => { data_type => 'INT', is_nullable => 0, is_auto_increment => 1 },
   'name'       => { data_type => 'VARCHAR', size => 64, is_nullable => 0 },
-  'region'     => { data_type => 'INT', is_nullable => 0 },
   'public'     => { data_type => 'INT', is_nullable => 1 },
   'sort_order' => { data_type => 'INT', is_nullable => 1 },
   'tax'        => { data_type => 'INT', is_nullable => 1 },
 );
 
 __PACKAGE__->set_primary_key('id');
-
-__PACKAGE__->belongs_to( region => 'Lecstor::Schema::Result::CountryRegion' );
 
 __PACKAGE__->add_unique_constraint([ qw/name/ ]);
 

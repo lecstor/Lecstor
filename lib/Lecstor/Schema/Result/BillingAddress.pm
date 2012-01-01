@@ -25,7 +25,7 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_primary_key('id');
 
-#__PACKAGE__->belongs_to( country => 'Lecstor7::DB::Result::Country' );
+__PACKAGE__->belongs_to( country => 'Lecstor::Schema::Result::Country' );
 
 __PACKAGE__->add_unique_constraint(
   full => [ qw/name company street suburb state postcode country/ ],

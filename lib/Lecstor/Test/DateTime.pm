@@ -1,5 +1,6 @@
 package Lecstor::Test::DateTime;
 use Hook::LexWrap;
+use Sub::Exporter;
 use DateTime;
 
 sub import {
