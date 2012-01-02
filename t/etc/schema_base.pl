@@ -2,7 +2,13 @@
     'schema_class' => 'Lecstor::Schema',
     'traits' => [qw!Testmysqld!],
     'fixture_sets' => {
-        'basic' => [
+        'login' => [
+            'LoginRole' => [
+                ['name'],
+                ['Role1'],
+                ['Role2'],
+                ['Role3'],
+            ],
         ],
     },
 };
