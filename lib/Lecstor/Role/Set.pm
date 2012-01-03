@@ -82,6 +82,20 @@ sub find{
     return $self->prefetch_single_related_rs->find($id);
 }
 
+=method find_or_create
+
+=cut
+
+sub find_or_create{
+    my ($self, $args) = @_;
+    my $model = $self->find($args);
+    unless ($model){
+        $args = { id => $args } unless ref $args;
+        $model = $self->create($args);
+    }
+    return $model;
+}
+
 =method prefetch_single_related_rs
 
   $rs = $collection->prefetch_single_related_rs;

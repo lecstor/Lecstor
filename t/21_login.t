@@ -27,73 +27,92 @@ is $yesterday->dmy, '31-12-2011', 'yesterday date ok';
 
 ok my $login_set = Lecstor::Set::Login->new( schema => Schema ), 'get login_set ok';
 
-ok my $login = $login_set->create({
-    username => 'lecstor',
-    email => 'test1@eightdegrees.com.au',
-    password => 'abcd1234',
-}), 'create login ok';
+my ($login, $login2, $login3, $login4);
 
-diag($login->error) if $login->isa('Lecstor::Error');
+note('Create test logins'); {
 
-isa_ok $login, 'Lecstor::Model::Login';
-is $login->username, 'lecstor', 'username ok';
-is $login->email, 'test1@eightdegrees.com.au', 'email ok';
-is $login->created, '2012-01-01T14:00:00', 'created datetime ok';
-ok $login->check_password('abcd1234'), 'password ok';
+    ok $login = $login_set->create({
+        username => 'lecstor',
+        email => 'test1@eightdegrees.com.au',
+        password => 'abcd1234',
+    }), 'create login ok';
 
-ok $login->set_temporary_password({
-    password => '4321abcd',
-    expires => $tomorrow,
-}), 'set temporary password ok';
+    $login2 = $login_set->create({
+        username => 'lecstor2',
+        email => 'test2@eightdegrees.com.au',
+        password => 'abcd1234',
+    });
 
-ok $login->check_password('4321abcd'), 'temporary password ok';
+    $login3 = $login_set->create({
+        username => 'lecstor3',
+        email => 'test3@eightdegrees.com.au',
+        password => 'abcd1234',
+    });
 
-my @roles;
+    $login4 = $login_set->create({
+        username => 'lecstor4',
+        email => 'test4@eightdegrees.com.au',
+        password => 'abcd1234',
+    });
 
-ok @roles = $login->add_to_roles('Role1'), 'add role by name ok';
-isa_ok $roles[0], 'Lecstor::Schema::Result::LoginRole';
-is $roles[0]->name, 'Role1', 'role name ok';
+}
 
+note('Basic login test'); {
 
-my $login2 = $login_set->create({
-    username => 'lecstor2',
-    email => 'test2@eightdegrees.com.au',
-    password => 'abcd1234',
-});
+    diag($login->error) if $login->isa('Lecstor::Error');
+    is $login->username, 'lecstor', 'username ok';
+    is $login->email, 'test1@eightdegrees.com.au', 'email ok';
+    is $login->created, '2012-01-01T14:00:00', 'created datetime ok';
+    ok $login->check_password('abcd1234'), 'password ok';
 
-ok my $tmp = $login2->set_temporary_password({
-    password => '4321abcd',
-    expires => $yesterday,
-}), 'set temporary password ok';
+}
 
-ok !$login2->check_password('4321abcd'), 'expired temporary password failed ok';
+note('Test temporary passwords'); {
 
+    ok $login->set_temporary_password({
+        password => '4321abcd',
+        expires => $tomorrow,
+    }), 'set temporary password ok';
+    ok $login->check_password('4321abcd'), 'temporary password ok';
 
-ok $login2->add_to_roles(qw! Role1 Role3 !), 'add roles by name ok';
-is_deeply [qw! Role1 Role3 !], [sort map{ $_->name } $login2->roles], 'role names ok';
-is_deeply [qw! Role1 Role3 !], [$login2->roles_by_name], 'roles by name ok';
+    ok my $tmp = $login2->set_temporary_password({
+        password => '4321abcd',
+        expires => $yesterday,
+    }), 'set temporary password ok';
 
-@roles = ResultSet('LoginRole')->all;
+    ok !$login2->check_password('4321abcd'), 'expired temporary password failed ok';
 
-my $login3 = $login_set->create({
-    username => 'lecstor3',
-    email => 'test3@eightdegrees.com.au',
-    password => 'abcd1234',
-});
+}
 
-ok $login3->add_to_roles($roles[0]), 'add role by object ok';
-is_deeply [qw! Role1 !], [$login3->roles_by_name], 'roles by name ok';
+note('login set inflates results to login model; create, find, search'); {
 
+    isa_ok $login, 'Lecstor::Model::Login';
+    isa_ok $login_set->find(1), 'Lecstor::Model::Login';
+    isa_ok $login_set->search({ id => 1 })->first, 'Lecstor::Model::Login';
 
-my $login4 = $login_set->create({
-    username => 'lecstor4',
-    email => 'test4@eightdegrees.com.au',
-    password => 'abcd1234',
-});
+}
 
-ok $login4->add_to_roles(@roles), 'add roles by object ok';
-is_deeply [qw! Role1 Role2 Role3 !], [$login4->roles_by_name], 'roles by name ok';
+note('Test roles'); {
 
+    my @roles;
+
+    ok @roles = $login->add_to_roles('Role1'), 'add role by name ok';
+    isa_ok $roles[0], 'Lecstor::Schema::Result::LoginRole';
+    is $roles[0]->name, 'Role1', 'role name ok';
+
+    ok $login2->add_to_roles(qw! Role1 Role3 !), 'add roles by name ok';
+    is_deeply [qw! Role1 Role3 !], [sort map{ $_->name } $login2->roles], 'role names ok';
+    is_deeply [qw! Role1 Role3 !], [$login2->roles_by_name], 'roles by name ok';
+
+    @roles = ResultSet('LoginRole')->all;
+
+    ok $login3->add_to_roles($roles[0]), 'add role by object ok';
+    is_deeply [qw! Role1 !], [$login3->roles_by_name], 'roles by name ok';
+
+    ok $login4->add_to_roles(@roles), 'add roles by object ok';
+    is_deeply [qw! Role1 Role2 Role3 !], [$login4->roles_by_name], 'roles by name ok';
+
+}
 
 
 done_testing();

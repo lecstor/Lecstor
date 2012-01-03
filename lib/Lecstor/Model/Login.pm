@@ -73,6 +73,12 @@ sub add_to_roles{
     return @objects;
 }
 
+=method roles_by_name
+
+    my @role_names = $login->roles_by_name;
+
+=cut
+
 sub roles_by_name{
     my ($self) = @_;
     return sort map{ $_->name } $self->roles;
