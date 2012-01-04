@@ -13,6 +13,12 @@ has '+data' => (
     !]
 );
 
+sub name{
+    my $self = shift;
+    die "$self->name is readonly" if @_;
+    return join(' ', $self->firstname, $self->surname);
+}
+
 sub delivery_address{
     my ($self) = @_;
     return unless $self->default_delivery;
