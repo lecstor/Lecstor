@@ -32,7 +32,7 @@ sub BUILD{
 has model => ( is => 'ro', isa => 'Lecstor::App::Model', required => 0 );
 
 has session_id => ( is => 'rw', isa => 'Str', required => 0 );
-has login => ( is => 'rw', isa => 'Lecstor::Model::Login', required => 0 );
+has login => ( is => 'rw', isa => 'Lecstor::Model::Instance::Login', required => 0 );
 
 has validator_class => ( is => 'ro', isa => 'Str', builder => '_build_validator_class' );
 

@@ -26,7 +26,7 @@ Test::AppBasic::run($app, Schema);
 
 ok my $login_set = $app->login, 'get login_set ok';
 
-isa_ok $login_set, 'App::Set::Login';
+isa_ok $login_set, 'App::Model::Controller::Login';
 
 ok my $login = $login_set->find(1), 'found login ok';
 

@@ -1,4 +1,4 @@
-package Lecstor::Set;
+package Lecstor::Model::Controller;
 use Moose;
 use MooseX::StrictConstructor;
 use DateTime;

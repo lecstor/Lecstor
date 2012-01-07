@@ -1,16 +1,16 @@
-package Lecstor::Set::Collection;
+package Lecstor::Model::Controller::Collection;
 use Moose;
 use Class::Load ('load_class');
 
 # ABSTRACT: interface to product collection records
 
-extends 'Lecstor::Set';
+extends 'Lecstor::Model::Controller';
 
 sub resultset_name{ 'Collection' }
 
 has model_class => ( isa => 'Str', is => 'ro', builder => '_build_model_class' );
 
-sub _build_model_class{ 'Lecstor::Model::Collection' }
+sub _build_model_class{ 'Lecstor::Model::Instance::Collection' }
 
 =head1 DESCRIPTION
 
@@ -21,7 +21,7 @@ CollectionType set.
 
 =head1 SYNOPSIS
 
-    my $collection_set = Lecstor::Set::Collection->new({
+    my $collection_set = Lecstor::Model::Controller::Collection->new({
         schema => $dbic_schema,
     });
 

@@ -1,20 +1,20 @@
-package Lecstor::Set::Product;
+package Lecstor::Model::Controller::Product;
 use Moose;
 use Class::Load ('load_class');
 
 # ABSTRACT: interface to product records
 
-extends 'Lecstor::Set';
+extends 'Lecstor::Model::Controller';
 
 sub resultset_name{ 'Product' }
 
 has model_class => ( isa => 'Str', is => 'ro', builder => '_build_model_class' );
 
-sub _build_model_class{ 'Lecstor::Model::Product' }
+sub _build_model_class{ 'Lecstor::Model::Instance::Product' }
 
 =head1 SYNOPSIS
 
-    my $product_set = Lecstor::Set::Product->new({
+    my $product_set = Lecstor::Model::Controller::Product->new({
         schema => $dbic_schema,
     });
 

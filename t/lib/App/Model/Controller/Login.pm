@@ -1,7 +1,7 @@
-package App::Set::Login;
+package App::Model::Controller::Login;
 use Moose;
 
-extends 'Lecstor::Set::Login';
+extends 'Lecstor::Model::Controller::Login';
 
 # ABSTRACT: add our little touches to the login set with no schema changes.
 

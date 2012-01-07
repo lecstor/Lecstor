@@ -2,7 +2,7 @@ package App::Schema::Result::Person;
 use strict;
 use warnings;
 use base 'Lecstor::Schema::Result::Person';
-use App::Model::Person;
+use App::Model::Instance::Person;
 
 __PACKAGE__->load_components(qw/ Helper::Row::SubClass Core /);
 
@@ -23,7 +23,7 @@ sub inflate_result {
     return unless $result;
     # $result has already been through our parent's inflate_result
     # so it's actually a Lecstor::Model::Person..
-    return App::Model::Person->new( _record => $result->_record );
+    return App::Model::Instance::Person->new( _record => $result->_record );
 }
  
 

@@ -26,7 +26,7 @@ Test::AppBasic::run($app, Schema);
 
 ok my $person_set = $app->person, 'get person_set ok';
 
-isa_ok $person_set, 'App::Set::Person';
+isa_ok $person_set, 'App::Model::Controller::Person';
 
 ok my $fred = $person_set->create({
     firstname => 'Fred',

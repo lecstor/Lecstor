@@ -1,20 +1,20 @@
-package Lecstor::Set::Session;
+package Lecstor::Model::Controller::Session;
 use Moose;
 use Class::Load ('load_class');
 
 # ABSTRACT: interface to session records
 
-extends 'Lecstor::Set';
+extends 'Lecstor::Model::Controller';
 
 sub resultset_name{ 'Session' }
 
 has model_class => ( isa => 'Str', is => 'ro', builder => '_build_model_class' );
 
-sub _build_model_class{ 'Lecstor::Model::Session' }
+sub _build_model_class{ 'Lecstor::Model::Instance::Session' }
 
 =head1 SYNOPSIS
 
-    my $session_set = Lecstor::Set::Session->new({
+    my $session_set = Lecstor::Model::Controller::Session->new({
         schema => $dbic_schema,
     });
 

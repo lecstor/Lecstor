@@ -2,12 +2,12 @@ package Lecstor::App::Model;
 use Moose;
 use Class::Load 'load_class';
 
-use Lecstor::Set::Person;
-use Lecstor::Set::Action;
-use Lecstor::Set::Login;
-use Lecstor::Set::Collection;
-use Lecstor::Set::Product;
-use Lecstor::Set::Session;
+use Lecstor::Model::Controller::Person;
+use Lecstor::Model::Controller::Action;
+use Lecstor::Model::Controller::Login;
+use Lecstor::Model::Controller::Collection;
+use Lecstor::Model::Controller::Product;
+use Lecstor::Model::Controller::Session;
 use Lecstor::Lucy::Indexer;
 use Lecstor::Lucy::Searcher;
 
@@ -53,49 +53,49 @@ sub _build_template_processor{
 
 =cut
 
-has action => ( isa => 'Lecstor::Set::Action', is => 'ro', lazy_build => 1 );
+has action => ( isa => 'Lecstor::Model::Controller::Action', is => 'ro', lazy_build => 1 );
 
-sub _build_action{ Lecstor::Set::Action->new( schema => $_[0]->schema ) }
+sub _build_action{ Lecstor::Model::Controller::Action->new( schema => $_[0]->schema ) }
 
 =attr person
 
 =cut
 
-has person => ( isa => 'Lecstor::Set::Person', is => 'ro', lazy_build => 1 );
+has person => ( isa => 'Lecstor::Model::Controller::Person', is => 'ro', lazy_build => 1 );
 
-sub _build_person{ Lecstor::Set::Person->new( schema => $_[0]->schema ) }
+sub _build_person{ Lecstor::Model::Controller::Person->new( schema => $_[0]->schema ) }
 
 =attr login
 
 =cut
 
-has login => ( isa => 'Lecstor::Set::Login', is => 'ro', lazy_build => 1 );
+has login => ( isa => 'Lecstor::Model::Controller::Login', is => 'ro', lazy_build => 1 );
 
-sub _build_login{ Lecstor::Set::Login->new( schema => $_[0]->schema ) }
+sub _build_login{ Lecstor::Model::Controller::Login->new( schema => $_[0]->schema ) }
 
 =attr collection
 
 =cut
 
-has collection => ( isa => 'Lecstor::Set::Collection', is => 'ro', lazy_build => 1 );
+has collection => ( isa => 'Lecstor::Model::Controller::Collection', is => 'ro', lazy_build => 1 );
 
-sub _build_collection{ Lecstor::Set::Collection->new( schema => $_[0]->schema ) }
+sub _build_collection{ Lecstor::Model::Controller::Collection->new( schema => $_[0]->schema ) }
 
 =attr product
 
 =cut
 
-has product => ( isa => 'Lecstor::Set::Product', is => 'ro', lazy_build => 1 );
+has product => ( isa => 'Lecstor::Model::Controller::Product', is => 'ro', lazy_build => 1 );
 
-sub _build_product{ Lecstor::Set::Product->new( schema => $_[0]->schema ) }
+sub _build_product{ Lecstor::Model::Controller::Product->new( schema => $_[0]->schema ) }
 
 =attr session
 
 =cut
 
-has session => ( isa => 'Lecstor::Set::Session', is => 'ro', lazy_build => 1 );
+has session => ( isa => 'Lecstor::Model::Controller::Session', is => 'ro', lazy_build => 1 );
 
-sub _build_session{ Lecstor::Set::Session->new( schema => $_[0]->schema ) }
+sub _build_session{ Lecstor::Model::Controller::Session->new( schema => $_[0]->schema ) }
 
 =attr product_indexer
 

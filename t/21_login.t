@@ -16,7 +16,7 @@ use Test::DBIx::Class {
 fixtures_ok 'login'
     => 'installed the product fixtures from configuration files';
 
-use_ok('Lecstor::Set::Login');
+use_ok('Lecstor::Model::Controller::Login');
 
 my $now = DateTime->now;
 my $tomorrow = $now->clone->add( days => 1 );
@@ -25,7 +25,7 @@ is $tomorrow->dmy, '02-01-2012', 'tomorrow date ok';
 is $yesterday->dmy, '31-12-2011', 'yesterday date ok';
 
 
-ok my $login_set = Lecstor::Set::Login->new( schema => Schema ), 'get login_set ok';
+ok my $login_set = Lecstor::Model::Controller::Login->new( schema => Schema ), 'get login_set ok';
 
 my ($login, $login2, $login3, $login4);
 
@@ -86,9 +86,9 @@ note('Test temporary passwords'); {
 
 note('login set inflates results to login model; create, find, search'); {
 
-    isa_ok $login, 'Lecstor::Model::Login';
-    isa_ok $login_set->find(1), 'Lecstor::Model::Login';
-    isa_ok $login_set->search({ id => 1 })->first, 'Lecstor::Model::Login';
+    isa_ok $login, 'Lecstor::Model::Instance::Login';
+    isa_ok $login_set->find(1), 'Lecstor::Model::Instance::Login';
+    isa_ok $login_set->search({ id => 1 })->first, 'Lecstor::Model::Instance::Login';
 
 }
 
