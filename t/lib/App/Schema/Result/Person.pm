@@ -23,7 +23,7 @@ sub inflate_result {
     return unless $result;
     # $result has already been through our parent's inflate_result
     # so it's actually a Lecstor::Model::Person..
-    return App::Model::Person->new( data => $result->data );
+    return App::Model::Person->new( _record => $result->_record );
 }
  
 

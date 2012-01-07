@@ -9,16 +9,21 @@ our $VERSION = "0.01";
 
 sub get_session_data {
     my ($c, $key) = @_;
-    my ($type, $key) = split(/:/, $key);
-    my $session = $c->lecstor->session->find_or_create($key);
+    my $type;
+    ($type, $key) = split(/:/, $key);
+    my $session = $c->lecstor->model->session->find_or_create($key);
+
     return $session->expires if $type eq 'expires';
-    return $session->data->{$type};
+
+    my $data = $session->data || {};
+    return $data->{$type};
 }
  
 sub store_session_data {
     my ($c, $key, $data) = @_;
-    my ($type, $key) = split(/:/, $key);
-    my $session = $c->lecstor->session->find_or_create($key);
+    my $type;
+    ($type, $key) = split(/:/, $key);
+    my $session = $c->lecstor->model->session->find_or_create($key);
     if ($type eq 'expires'){
         $session->update({ expires => $data });
     } else {
@@ -31,12 +36,13 @@ sub store_session_data {
  
 sub delete_session_data {
     my ( $c, $key ) = @_;
-    my ($type, $key) = split(/:/, $key);
-    $c->lecstor->session->find_or_create($key)->delete;
+    my $type;
+    ($type, $key) = split(/:/, $key);
+    $c->lecstor->model->session->find_or_create($key)->delete;
 }
  
 sub delete_expired_sessions {
-    $c->lecstor->session->delete_expired;
+    $_[0]->lecstor->session->delete_expired;
 }
 
 1;

@@ -1,4 +1,4 @@
-package Lecstor::Model::Collection;
+package Lecstor::Model::Action;
 use Moose;
 use DateTime;
 
@@ -6,9 +6,8 @@ extends 'Lecstor::Model';
 
 has '+_record' => (
     handles => [qw!
-        id created modified
-        name type
-        items products
+        id created data
+        type session login
     !]
 );
 

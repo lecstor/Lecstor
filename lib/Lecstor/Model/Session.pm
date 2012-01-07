@@ -2,12 +2,13 @@ package Lecstor::Model::Session;
 use Moose;
 use DateTime;
 
-with 'Lecstor::Model';
+extends 'Lecstor::Model';
 
-has '+data' => (
+has '+_record' => (
     handles => [qw!
         id created modified 
-        expires data 
+        expires data
+        update delete
     !]
 );
 

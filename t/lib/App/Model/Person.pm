@@ -3,7 +3,7 @@ use Moose;
 
 extends 'Lecstor::Model::Person';
 
-has 'data' => (
+has '_record' => (
     isa => 'App::Schema::Result::Person', is => 'ro',
     handles => [qw!
         id created modified
@@ -17,8 +17,8 @@ has 'data' => (
 
 sub add_to_friends{
     my ($self, $person) = @_;
-    $person = $person->data if $person->isa('App::Model::Person');
-    $self->data->add_to_friends($person);
+    $person = $person->_record if $person->isa('App::Model::Person');
+    $self->_record->add_to_friends($person);
 }
 
 __PACKAGE__->meta->make_immutable;

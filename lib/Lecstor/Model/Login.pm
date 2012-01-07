@@ -1,10 +1,10 @@
 package Lecstor::Model::Login;
 use Moose;
 use DateTime;
+use Carp::Source 'source_cluck';
+extends 'Lecstor::Model';
 
-with 'Lecstor::Model';
-
-has '+data' => (
+has '+_record' => (
     handles => [qw!
         id created modified active
         username email person password
@@ -23,7 +23,8 @@ returns true if the supplied password is correct
 
 sub check_password{
   my ($self, $password) = @_;
-  return 1 if $self->data->check_password($password);
+  source_cluck "check_password - no record" unless $self->_record;
+  return 1 if $self->_record->check_password($password);
   if (my $tmppass = $self->temporary_password){
     if ($tmppass->expires < DateTime->now){
       $tmppass->delete;
@@ -68,7 +69,7 @@ sub add_to_roles{
     my @objects;
     foreach my $role (@roles){
         $role = { name => $role } unless ref $role;
-        push(@objects, $self->data->add_to_roles($role) );
+        push(@objects, $self->_record->add_to_roles($role) );
     }
     return @objects;
 }

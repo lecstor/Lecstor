@@ -2,9 +2,9 @@ package Lecstor::Model::Product;
 use Moose;
 use DateTime;
 
-with 'Lecstor::Model';
+extends 'Lecstor::Model';
 
-has '+data' => (
+has '+_record' => (
     handles => [qw!
         id created modified data 
         shop_id barcode name alias description price type primary_category

@@ -11,7 +11,7 @@ __PACKAGE__->table('session');
 
 __PACKAGE__->add_columns(
   'id'           => { data_type => 'CHAR', is_nullable => 0, size => 72 },
-  'expires'      => { data_type => 'DATETIME', is_nullable => 1 },
+  'expires'      => { data_type => 'INT', is_nullable => 1 },
   'data'         => { data_type => 'TEXT', is_nullable => 1, 'serializer_class' => 'JSON' },
   'created'      => { data_type => 'DATETIME', is_nullable => 1 },
   'modified'     => { data_type => 'TIMESTAMP', is_nullable => 1 },

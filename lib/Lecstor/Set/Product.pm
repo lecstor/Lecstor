@@ -4,9 +4,9 @@ use Class::Load ('load_class');
 
 # ABSTRACT: interface to product records
 
-sub resultset_name{ 'Product' }
+extends 'Lecstor::Set';
 
-with 'Lecstor::Role::Set';
+sub resultset_name{ 'Product' }
 
 has model_class => ( isa => 'Str', is => 'ro', builder => '_build_model_class' );
 
@@ -38,7 +38,7 @@ around 'create' => sub{
     my ($orig, $self, $params) = @_;
     my $model_class = $self->model_class;
     load_class($model_class);
-    return $model_class->new( data => $self->$orig($params) );
+    return $model_class->new( _record => $self->$orig($params) );
 };
 
 

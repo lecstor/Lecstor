@@ -1,11 +1,16 @@
-package Lecstor::Role::Collection;
-use Moose::Role;
+package Lecstor::Set;
+use Moose;
+use MooseX::StrictConstructor;
+use DateTime;
 
-# ABSTRACT: DEPRECATED see Lecstor::Role::Set instead
+# ABSTRACT: interface to a set of model objects
+
+# based on the collections role, but leaves it up to modified resultset
+# classes to return model objects instead of result objects.
 
 use Try::Tiny;
 
-requires qw! resultset_name !;
+sub resultset_name{}
 
 =attr schema
 
@@ -27,39 +32,28 @@ has rs     => (
 
 sub _build_rs{ $_[0]->schema->resultset($_[0]->resultset_name) }
 
-sub item_class {}
-
 =method create
-
-    $rows = $collection->create( $args );
-
-returns a collection item object if item_class is defined else returns a
-L<DBIx::Class::Result>.
 
 =cut
 
 sub create{
     my ($self, $args) = @_;
-    my $row = $self->rs->create($args);
-    my $item_class = $self->item_class;
-    $row = $item_class->new({ row => $row }) if $row && $item_class;
-    return $row;
+    $args->{created} = DateTime->now( time_zone => 'local' )
+        if !$args->{created} && $self->rs->result_source->has_column('created');
+    return $self->rs->create($args);
 }
 
 =method search
 
   $rows = $collection->search({ cond => 123 }, { attrs => 453 }); 
 
-returns an arrayref of collection item objects or L<DBIx::Class::Result> objects.
+returns an arrayref of item objects.
 
 =cut
 
 sub search{
     my ($self, @args) = @_;
-    my @items = $self->prefetch_single_related_rs->search(@args);
-    my $item_class = $self->item_class;
-    @items = map{ $item_class->new(row => $_) } @items if $item_class;
-    return \@items;
+    return $self->prefetch_single_related_rs->search(@args);
 }
 
 =method search_for_id
@@ -86,12 +80,21 @@ L<DBIx::Class::Result>.
 
 sub find{
     my ($self, $id) = @_;
-    my $row = $self->prefetch_single_related_rs->find($id);
-    if ($row){
-        my $item_class = $self->item_class;
-        $row = $item_class->new({ row => $row }) if $item_class;
+    return $self->prefetch_single_related_rs->find($id);
+}
+
+=method find_or_create
+
+=cut
+
+sub find_or_create{
+    my ($self, $args) = @_;
+    my $model = $self->find($args);
+    unless ($model){
+        $args = { id => $args } unless ref $args;
+        $model = $self->create($args);
     }
-    return $row;
+    return $model;
 }
 
 =method prefetch_single_related_rs
@@ -104,5 +107,6 @@ override this method to prefetch simple relationships.
 
 sub prefetch_single_related_rs{ $_[0]->rs }
 
+__PACKAGE__->meta->make_immutable;
 
 1;

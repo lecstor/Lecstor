@@ -1,28 +1,29 @@
-package Lecstor::Set::Session;
+package Lecstor::Set::Action;
 use Moose;
 use Class::Load ('load_class');
 
-# ABSTRACT: interface to session records
+# ABSTRACT: interface to action records
 
 extends 'Lecstor::Set';
 
-sub resultset_name{ 'Session' }
+sub resultset_name{ 'Action' }
 
 has model_class => ( isa => 'Str', is => 'ro', builder => '_build_model_class' );
 
-sub _build_model_class{ 'Lecstor::Model::Session' }
+sub _build_model_class{ 'Lecstor::Model::Action' }
 
 =head1 SYNOPSIS
 
-    my $session_set = Lecstor::Set::Session->new({
+    my $action_set = Lecstor::Set::Action->new({
         schema => $dbic_schema,
     });
 
-    my $session = $session_set->find_or_create($key);
-    $session->update({
-        expires => time + 3600,
-        session_data => {},
-    });
+    my $action = $action_set->create(
+        type => $type_str,
+        session => $session_id,
+        data => $data_hash,
+        person => $user_id,
+    );
 
 =cut
 

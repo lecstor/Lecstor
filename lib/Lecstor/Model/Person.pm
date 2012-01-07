@@ -1,9 +1,9 @@
 package Lecstor::Model::Person;
 use Moose;
 
-with 'Lecstor::Model';
+extends 'Lecstor::Model';
 
-has '+data' => (
+has '+_record' => (
     handles => [qw!
         id created modified
         update
@@ -22,15 +22,15 @@ sub name{
 sub delivery_address{
     my ($self) = @_;
     return unless $self->default_delivery;
-    return $self->data->delivery_addresses->search({
+    return $self->_record->delivery_addresses->search({
         id => $self->default_delivery
     })->first;
 }
 
 sub add_to_delivery_addresses{
     my ($self, $address) = @_;
-    my $new_addr = $self->data->add_to_delivery_addresses($address);
-    $self->data->update({ default_delivery => $new_addr->id });
+    my $new_addr = $self->_record->add_to_delivery_addresses($address);
+    $self->_record->update({ default_delivery => $new_addr->id });
     return $new_addr;
 }
 

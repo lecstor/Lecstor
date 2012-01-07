@@ -4,12 +4,12 @@ use Class::Load ('load_class');
 
 # ABSTRACT: interface to login records
 
+extends 'Lecstor::Set';
+
 use Lecstor::Valid::Login;
 use Lecstor::Error;
 
 sub resultset_name{ 'Login' }
-
-with 'Lecstor::Role::Set';
 
 has model_class => ( isa => 'Str', is => 'ro', builder => '_build_model_class' );
 
@@ -41,7 +41,7 @@ around 'create' => sub{
     $params->{active} = 1 unless exists $params->{active};
     my $model_class = $self->model_class;
     load_class($model_class);
-    return $model_class->new( data => $self->$orig($params) );
+    return $model_class->new( _record => $self->$orig($params) );
 };
 
 __PACKAGE__->meta->make_immutable;

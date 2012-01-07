@@ -15,7 +15,7 @@ extends 'Lecstor::Set::Login';
 around 'create' => sub{
     my ($orig, $self, $params) = @_;
     my $model = $self->$orig($params);
-    $model->data->update({ active => 0 });
+    $model->_record->update({ active => 0 });
     return $model;
 };
 
