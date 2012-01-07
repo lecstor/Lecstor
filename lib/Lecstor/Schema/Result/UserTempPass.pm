@@ -1,4 +1,4 @@
-package Lecstor::Schema::Result::LoginTempPass;
+package Lecstor::Schema::Result::UserTempPass;
 use strict;
 use warnings;
 
@@ -10,7 +10,7 @@ __PACKAGE__->table('login_temp_pass');
 
 __PACKAGE__->add_columns(
   'id'       => { data_type => 'INT', is_nullable => 0, is_auto_increment => 1 },
-  'login'    => { data_type => 'INT', is_nullable => 0 },
+  'user'     => { data_type => 'INT', is_nullable => 0 },
   'expires'  => { data_type => 'DATETIME', is_nullable => 0 },
 
   # Have the 'password' column use a SHA-1 hash and 10-character salt
@@ -28,9 +28,9 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_primary_key('id');
 
-__PACKAGE__->belongs_to( 'login' => 'Lecstor::Schema::Result::Login' );
+__PACKAGE__->belongs_to( 'user' => 'Lecstor::Schema::Result::User' );
 
-=attr login
+=attr user
 
 =attr expires
 

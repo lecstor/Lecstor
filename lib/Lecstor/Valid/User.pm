@@ -1,12 +1,12 @@
-package Lecstor::Valid::Login;
+package Lecstor::Valid::User;
 use Validation::Class;
 use Email::Valid;
 
-# ABSTRACT: validate login details
+# ABSTRACT: validate user details
 
 =head1 SYNOPSIS
 
-    my $rules = Lecstor::Valid::Person->new(
+    my $rules = Lecstor::Valid::User->new(
         params => {
             email => 'jason@lecstor.com',
             password => 'abc123',

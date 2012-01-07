@@ -1,4 +1,4 @@
-package Lecstor::Model::Instance::Login;
+package Lecstor::Model::Instance::User;
 use Moose;
 use DateTime;
 extends 'Lecstor::Model::Instance';
@@ -35,7 +35,7 @@ sub check_password{
 
 =method set_temporary_password
 
-    $login->set_temporary_password({
+    $user->set_temporary_password({
         password => '4321abcd',
         expires => DateTime->now->add( days => 1 ),
     });
@@ -44,21 +44,21 @@ sub check_password{
 
 sub set_temporary_password{
     my ($self, $args) = @_;
-    $args->{login} = $self->id;
+    $args->{user} = $self->id;
     return $self->related_resultset('temporary_password')->create($args);
 }
 
 =method add_to_roles
 
-    @roles = $login->add_to_roles('Role1');
-    @roles = $login->add_to_roles(qw! Role1 Role3 !)
-    @roles = $login->add_to_roles({ name => 'Role1' });
-    @roles = $login->add_to_roles([
+    @roles = $user->add_to_roles('Role1');
+    @roles = $user->add_to_roles(qw! Role1 Role3 !)
+    @roles = $user->add_to_roles({ name => 'Role1' });
+    @roles = $user->add_to_roles([
         { name => 'Role1' },
         { name => 'Role3' },
     ]);
-    @roles = $login->add_to_roles($dbic_role_result);
-    @roles = $login->add_to_roles($dbic_role_result, $dbic_role_result2);
+    @roles = $user->add_to_roles($dbic_role_result);
+    @roles = $user->add_to_roles($dbic_role_result, $dbic_role_result2);
 
 =cut
 
@@ -74,7 +74,7 @@ sub add_to_roles{
 
 =method roles_by_name
 
-    my @role_names = $login->roles_by_name;
+    my @role_names = $user->roles_by_name;
 
 =cut
 

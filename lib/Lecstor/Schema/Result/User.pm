@@ -1,4 +1,4 @@
-package Lecstor::Schema::Result::Login;
+package Lecstor::Schema::Result::User;
 use strict;
 use warnings;
 
@@ -6,7 +6,7 @@ use base qw/DBIx::Class/;
 
 __PACKAGE__->load_components(qw/ InflateColumn::DateTime EncodedColumn Core /);
 
-__PACKAGE__->table('login');
+__PACKAGE__->table('user');
 
 __PACKAGE__->add_columns(
   'id'               => { data_type => 'INT', is_nullable => 0, is_auto_increment => 1 },
@@ -36,16 +36,16 @@ __PACKAGE__->add_unique_constraint(['username']);
 
 __PACKAGE__->belongs_to( person => 'Lecstor::Schema::Result::Person'    );
 
-__PACKAGE__->has_many(login_to_role_maps => 'Lecstor::Schema::Result::LoginToRoleMap', 'login');
-__PACKAGE__->many_to_many(roles => 'login_to_role_maps', 'role');
+__PACKAGE__->has_many(user_role_maps => 'Lecstor::Schema::Result::UserRoleMap', 'user');
+__PACKAGE__->many_to_many(roles => 'user_role_maps', 'role');
 
-__PACKAGE__->might_have( temporary_password => 'Lecstor::Schema::Result::LoginTempPass', 'login' );
+__PACKAGE__->might_have( temporary_password => 'Lecstor::Schema::Result::UserTempPass', 'user' );
 
 sub inflate_result {
     my $self = shift;
     my $ret = $self->next::method(@_);
     return unless $ret;
-    return Lecstor::Model::Instance::Login->new( _record => $ret );
+    return Lecstor::Model::Instance::User->new( _record => $ret );
 }
  
 
@@ -67,7 +67,7 @@ L<DateTime>
 
 =method roles
 
-returns a list of L<LoginRole> objects
+returns a list of L<UserRole> objects
 
 =cut
 

@@ -23,7 +23,7 @@ sub BUILDARGS{
 sub find_user{
   my ($self, $authinfo, $c) = @_;
 
-  my $user = $c->lecstor->model->login->find($authinfo);
+  my $user = $c->lecstor->model->user->find($authinfo);
   return unless $user;
 
   return Catalyst::Authentication::User::Lecstor->new({ user_object => $user });

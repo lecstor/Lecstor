@@ -20,7 +20,7 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_primary_key('id');
 
-__PACKAGE__->belongs_to( 'login' => 'Lecstor::Schema::Result::Login', undef, { join_type => 'LEFT OUTER' } );
+__PACKAGE__->belongs_to( 'login' => 'Lecstor::Schema::Result::User', undef, { join_type => 'LEFT OUTER' } );
 __PACKAGE__->belongs_to( 'type' => 'Lecstor::Schema::Result::ActionType' );
 
 1;

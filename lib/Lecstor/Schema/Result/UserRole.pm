@@ -1,4 +1,4 @@
-package Lecstor::Schema::Result::LoginRole;
+package Lecstor::Schema::Result::UserRole;
 use strict;
 use warnings;
 
@@ -6,7 +6,7 @@ use base qw/DBIx::Class/;
 
 __PACKAGE__->load_components(qw/ Core /);
 
-__PACKAGE__->table('login_role');
+__PACKAGE__->table('user_role');
 
 __PACKAGE__->add_columns(
   'id'      => { data_type => 'INT', is_nullable => 0, is_auto_increment => 1 },
@@ -18,13 +18,13 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_primary_key('id');
 
-__PACKAGE__->has_many(login_to_role_maps => 'Lecstor::Schema::Result::LoginToRoleMap', 'role');
-__PACKAGE__->many_to_many(logins => 'login_to_role_maps', 'login');
+__PACKAGE__->has_many(user_role_maps => 'Lecstor::Schema::Result::UserRoleMap', 'role');
+__PACKAGE__->many_to_many(users => 'user_role_maps', 'user');
 
 
 =attr id
 
-=attr login
+=attr user
 
 =attr role
 

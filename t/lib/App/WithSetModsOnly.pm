@@ -2,7 +2,7 @@ package App::WithSetModsOnly;
 use Moose;
 
 use Lecstor::Model::Controller::Person;
-use App::Model::Controller::Login;
+use App::Model::Controller::User;
 use Lecstor::Model::Controller::Collection;
 use Lecstor::Model::Controller::Product;
 
@@ -19,11 +19,11 @@ foreach my $set (qw! person collection product !){
     );
 }
 
-has login => (
+has user => (
     isa => 'Object', is => 'ro', lazy => 1,
     default => sub {
         my ($self) = @_;
-        return App::Model::Controller::Login->new( schema => $self->schema );
+        return App::Model::Controller::User->new( schema => $self->schema );
     }
 );
 

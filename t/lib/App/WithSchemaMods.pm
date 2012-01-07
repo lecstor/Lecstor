@@ -2,13 +2,13 @@ package App::WithSchemaMods;
 use Moose;
 
 use App::Model::Controller::Person;
-use Lecstor::Model::Controller::Login;
+use Lecstor::Model::Controller::User;
 use Lecstor::Model::Controller::Collection;
 use Lecstor::Model::Controller::Product;
 
 has schema => ( isa => 'DBIx::Class::Schema', is => 'ro' );
 
-foreach my $set (qw! login collection product !){
+foreach my $set (qw! user collection product !){
     my $class = 'Lecstor::Model::Controller::'. ucfirst($set);
     has $set => (
         isa => 'Object', is => 'ro', lazy => 1,

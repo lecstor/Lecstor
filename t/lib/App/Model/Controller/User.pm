@@ -1,13 +1,13 @@
-package App::Model::Controller::Login;
+package App::Model::Controller::User;
 use Moose;
 
-extends 'Lecstor::Model::Controller::Login';
+extends 'Lecstor::Model::Controller::User';
 
-# ABSTRACT: add our little touches to the login set with no schema changes.
+# ABSTRACT: add our little touches to the user set with no schema changes.
 
 # if we don't override the schema result we'll get Lecstor::Models back from
 # searches so we really shouldn't override the model class here.
-#sub _build_model_class{ 'App::Model::Login' }
+#sub _build_model_class{ 'App::Model::User' }
 
 
 # for efficiency we should probably override create altogether but let's

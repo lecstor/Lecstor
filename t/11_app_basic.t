@@ -14,7 +14,7 @@ use Test::DBIx::Class {
     config_path => [ File::Spec->splitdir($Bin), qw(etc schema_base) ],
 };
 
-fixtures_ok 'login'
+fixtures_ok 'user'
     => 'installed the product fixtures from configuration files';
 
 use_ok('App::Basic');
@@ -24,13 +24,13 @@ my $app = App::Basic->new( schema => Schema );
 
 Test::AppBasic::run($app, Schema);
 
-ok my $login_set = $app->login, 'get login_set ok';
+ok my $user_set = $app->user, 'get login_set ok';
 
-isa_ok $login_set, 'Lecstor::Model::Controller::Login';
+isa_ok $user_set, 'Lecstor::Model::Controller::User';
 
-ok my $login = $login_set->find(1), 'found login ok';
+ok my $user = $user_set->find(1), 'found user ok';
 
-is $login->active, 1, 'login active ok';
+is $user->active, 1, 'user active ok';
 
 done_testing();
 

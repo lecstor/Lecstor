@@ -20,7 +20,7 @@ use Class::Load 'load_class';
 
 =attr person
 
-=attr login
+=attr user
 
 =attr collection
 
@@ -32,7 +32,7 @@ use Class::Load 'load_class';
 
 has schema => ( is => 'ro', isa => 'DBIx::Class::Schema', required => 1 );
 
-foreach my $set (qw! Action Person Login Collection Product Session !){
+foreach my $set (qw! Action Person User Collection Product Session !){
     my $class = "Lecstor::Model::Controller::$set";
     load_class($class);
     has lc($set) => (

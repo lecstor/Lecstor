@@ -24,13 +24,13 @@ my $app = App::WithSetModsOnly->new( schema => Schema );
 
 Test::AppBasic::run($app, Schema);
 
-ok my $login_set = $app->login, 'get login_set ok';
+ok my $user_set = $app->user, 'get login_set ok';
 
-isa_ok $login_set, 'App::Model::Controller::Login';
+isa_ok $user_set, 'App::Model::Controller::User';
 
-ok my $login = $login_set->find(1), 'found login ok';
+ok my $user = $user_set->find(1), 'found login ok';
 
-is $login->active, 0, 'login not active ok';
+is $user->active, 0, 'login not active ok';
 
 done_testing();
 

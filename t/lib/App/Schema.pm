@@ -11,7 +11,7 @@ __PACKAGE__->load_namespaces();
 
 foreach my $res (qw!
     BillingAddress Collection CollectionItem CollectionType Country DeliveryAddress
-    Login LoginRole LoginTempPass LoginToRoleMap  PersonCollectionMap
+    User UserRole UserTempPass UserRoleMap  PersonCollectionMap
     Product ProductCategory ProductCategoryMap ProductShipping ProductStatus ProductType
     Session SessionCollectionMap
 !){

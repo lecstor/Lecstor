@@ -7,7 +7,7 @@ extends 'Lecstor::Model::Instance';
 has '+_record' => (
     handles => [qw!
         id created data
-        type session login
+        type session user
     !]
 );
 

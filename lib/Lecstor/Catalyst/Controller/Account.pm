@@ -37,7 +37,7 @@ sub register :Chained('setup') :PathPart('register') :Args(0){
         if ($result->isa('Lecstor::Error')){
             $c->stash->{error} = $result;
         } else {
-            $c->stash->{login} = $result;
+            $c->stash->{user} = $result;
         }
     }
 
@@ -64,7 +64,7 @@ sub login :Chained('setup') :PathPart('login') :Args(0){
     my $action = delete $params->{action}; # name of submit button
 
     if ($action){
-        my $v = $app->validator({ params => $params })->class('login');
+        my $v = $app->validator({ params => $params })->class('user');
         if ( $v->validate ){
             if ( $c->authenticate({ email => $params->{email}, password => $params->{password} }) ){
                 $app->logged_in($c->user->user_object);

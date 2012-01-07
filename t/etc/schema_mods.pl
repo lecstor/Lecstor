@@ -2,8 +2,8 @@
     'schema_class' => 'App::Schema',
     'traits' => [qw!Testmysqld!],
     'fixture_sets' => {
-        'login' => [
-            'LoginRole' => [
+        'user' => [
+            'UserRole' => [
                 ['name'],
                 ['Role1'],
                 ['Role2'],

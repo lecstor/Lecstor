@@ -6,7 +6,7 @@ sub run{
 
     ok my $person_set = $app->person, 'get person_set ok';
 
-    ok my $login_set = $app->login, 'get login_set ok';
+    ok my $user_set = $app->user, 'get user_set ok';
 
 
     ok my $person = $person_set->create({
@@ -25,21 +25,21 @@ sub run{
         country => 'Australia',
     }), 'set billing_address ok';
 
-    ok my $login = $login_set->create({
+    ok my $user = $user_set->create({
         username => 'lecstor',
         email => 'test1@eightdegrees.com.au',
         password => 'abcd1234',
-    }), 'create login ok';
+    }), 'create user ok';
 
-    ok $login->update({ person => $person->id }), 'set login person';
+    ok $user->update({ person => $person->id }), 'set user person';
 
-    ok $login = $schema->resultset('Login')->find($login->id), 'find rs login ok';
+    ok $user = $schema->resultset('User')->find($user->id), 'find rs user ok';
 
-    is $login->person->id, $person->id, 'login rs person id ok';
+    is $user->person->id, $person->id, 'user rs person id ok';
 
-    is $login->person->firstname, 'Jason', 'login rs person name ok';
+    is $user->person->firstname, 'Jason', 'user rs person name ok';
 
-    ok $person = $login_set->find($login->id)->person, 'find model login person ok';
+    ok $person = $user_set->find($user->id)->person, 'find model user person ok';
 
     is $person->name, 'Jason Galea', 'person name ok';
 }

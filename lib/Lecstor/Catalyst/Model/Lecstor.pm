@@ -35,7 +35,7 @@ sub build_per_context_instance {
         session_id => $ctx->sessionid
     };
 
-    $args->{login} = $ctx->user->user_object if $ctx->user_exists;
+    $args->{user} = $ctx->user->user_object if $ctx->user_exists;
 
     return $app_class->new($args);
 }

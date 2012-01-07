@@ -3,7 +3,7 @@ use Moose;
 
 has schema => ( isa => 'DBIx::Class::Schema', is => 'ro' );
 
-foreach my $set (qw! person login collection product !){
+foreach my $set (qw! person user collection product !){
     my $class = 'Lecstor::Model::Controller::'. ucfirst($set);
     has $set => (
         isa => 'Object', is => 'ro', lazy => 1,

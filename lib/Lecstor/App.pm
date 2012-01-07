@@ -32,7 +32,7 @@ sub BUILD{
 has model => ( is => 'ro', isa => 'Lecstor::Model', required => 0 );
 
 has session_id => ( is => 'rw', isa => 'Str', required => 0 );
-has login => ( is => 'rw', isa => 'Lecstor::Model::Instance::Login', required => 0 );
+has user => ( is => 'rw', isa => 'Lecstor::Model::Instance::User', required => 0 );
 
 has validator_class => ( is => 'ro', isa => 'Str', builder => '_build_validator_class' );
 
@@ -106,7 +106,7 @@ sub log_action{
         session => $self->session_id,
     };
     $action->{data} = $data if $data;
-    $action->{login} = $self->login->id if $self->login;
+    $action->{user} = $self->user->id if $self->user;
 
     $self->run_after_request(
         sub{ $self->model->action->create($action); }
@@ -157,14 +157,14 @@ sub register{
 
     if ( $v->validate ){
         # input valid
-        if ($self->model->login->find({ email => $params->{email} })){
+        if ($self->model->user->find({ email => $params->{email} })){
             # email already registered
             my $error = 'That email address is already registered';
             $self->log_action('register fail', { email => $params->{email}, error => $error });
             $result = $self->error({ error => $error });
         } else {
             # params ok
-            $result = $self->model->login->create($v->get_params_hash);
+            $result = $self->model->user->create($v->get_params_hash);
         }
     } else {
         # invalid input
@@ -183,8 +183,8 @@ sub register{
 =cut
 
 sub logged_in{
-    my ($self,$login) = @_;
-    $self->login($login);
+    my ($self,$user) = @_;
+    $self->user($user);
     $self->log_action('login');
     $self->update_view;
 }
@@ -195,14 +195,14 @@ sub logged_in{
 
 sub update_view{
     my ($self) = @_;
-    my $login = $self->login;
-    if ($login){
+    my $user = $self->user;
+    if ($user){
         my $visitor = {
             logged_in => 1,
-            email => $login->email,
-            name => $login->username,
+            email => $user->email,
+            name => $user->username,
         };
-        $visitor->{name} ||= $login->person->name if $login->person;
+        $visitor->{name} ||= $user->person->name if $user->person;
         $self->view({ visitor => $visitor });
     }
 }
