@@ -1,7 +1,7 @@
-package Lecstor::Model::Login;
+package Lecstor::Model::Instance::Login;
 use Moose;
 use DateTime;
-extends 'Lecstor::Model';
+extends 'Lecstor::Model::Instance';
 
 has '+_record' => (
     handles => [qw!

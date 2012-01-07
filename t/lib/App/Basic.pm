@@ -1,15 +1,15 @@
 package App::Basic;
 use Moose;
 
-use Lecstor::Set::Person;
-use Lecstor::Set::Login;
-use Lecstor::Set::Collection;
-use Lecstor::Set::Product;
+use Lecstor::Model::Controller::Person;
+use Lecstor::Model::Controller::Login;
+use Lecstor::Model::Controller::Collection;
+use Lecstor::Model::Controller::Product;
 
 has schema => ( isa => 'DBIx::Class::Schema', is => 'ro' );
 
 foreach my $set (qw! person login collection product !){
-    my $class = 'Lecstor::Set::'. ucfirst($set);
+    my $class = 'Lecstor::Model::Controller::'. ucfirst($set);
     has $set => (
         isa => 'Object', is => 'ro', lazy => 1,
         default => sub {

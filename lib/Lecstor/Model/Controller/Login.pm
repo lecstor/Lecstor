@@ -1,10 +1,10 @@
-package Lecstor::Set::Login;
+package Lecstor::Model::Controller::Login;
 use Moose;
 use Class::Load ('load_class');
 
 # ABSTRACT: interface to login records
 
-extends 'Lecstor::Set';
+extends 'Lecstor::Model::Controller';
 
 use Lecstor::Valid::Login;
 use Lecstor::Error;
@@ -13,11 +13,11 @@ sub resultset_name{ 'Login' }
 
 has model_class => ( isa => 'Str', is => 'ro', builder => '_build_model_class' );
 
-sub _build_model_class{ 'Lecstor::Model::Login' }
+sub _build_model_class{ 'Lecstor::Model::Instance::Login' }
 
 =head1 SYNOPSIS
 
-    my $login_set = Lecstor::Set::Login->new({
+    my $login_set = Lecstor::Model::Controller::Login->new({
         schema => $dbic_schema,
     });
 

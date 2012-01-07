@@ -1,7 +1,7 @@
-package Lecstor::Model::Person;
+package Lecstor::Model::Instance::Person;
 use Moose;
 
-extends 'Lecstor::Model';
+extends 'Lecstor::Model::Instance';
 
 has '+_record' => (
     handles => [qw!

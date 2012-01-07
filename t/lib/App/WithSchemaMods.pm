@@ -1,15 +1,15 @@
 package App::WithSchemaMods;
 use Moose;
 
-use App::Set::Person;
-use Lecstor::Set::Login;
-use Lecstor::Set::Collection;
-use Lecstor::Set::Product;
+use App::Model::Controller::Person;
+use Lecstor::Model::Controller::Login;
+use Lecstor::Model::Controller::Collection;
+use Lecstor::Model::Controller::Product;
 
 has schema => ( isa => 'DBIx::Class::Schema', is => 'ro' );
 
 foreach my $set (qw! login collection product !){
-    my $class = 'Lecstor::Set::'. ucfirst($set);
+    my $class = 'Lecstor::Model::Controller::'. ucfirst($set);
     has $set => (
         isa => 'Object', is => 'ro', lazy => 1,
         default => sub {
@@ -23,7 +23,7 @@ has person => (
     isa => 'Object', is => 'ro', lazy => 1,
     default => sub {
         my ($self) = @_;
-        return App::Set::Person->new( schema => $self->schema );
+        return App::Model::Controller::Person->new( schema => $self->schema );
     }
 );
 

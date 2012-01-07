@@ -13,9 +13,9 @@ use Test::DBIx::Class {
     config_path => [ File::Spec->splitdir($Bin), qw(etc schema_base) ],
 }, 'Person';
 
-use_ok('Lecstor::Set::Person');
+use_ok('Lecstor::Model::Controller::Person');
 
-ok my $person_set = Lecstor::Set::Person->new( schema => Schema ), 'get person_set ok';
+ok my $person_set = Lecstor::Model::Controller::Person->new( schema => Schema ), 'get person_set ok';
 
 ok my $person = $person_set->create({
     firstname => 'Jason',
@@ -26,7 +26,7 @@ ok my $person = $person_set->create({
     mobile => '0123456789',
 }), 'create person ok';
 
-isa_ok $person, 'Lecstor::Model::Person';
+isa_ok $person, 'Lecstor::Model::Instance::Person';
 is $person->firstname, 'Jason', 'firstname ok';
 is $person->surname, 'Galea', 'surname ok';
 is $person->created, '2012-01-01T14:00:00', 'created datetime ok';
@@ -46,11 +46,11 @@ is $bill_addr->street, '123 Other St', 'street ok';
 is $bill_addr->country->name, 'Australia', 'country ok';
 
 ok $person = $person_set->find($person->id), 'find ok';
-isa_ok $person, 'Lecstor::Model::Person';
+isa_ok $person, 'Lecstor::Model::Instance::Person';
 is $person->firstname, 'Jason', 'firstname ok';
 
 ok $person = $person_set->search({ id => $person->id })->first, 'search first ok';
-isa_ok $person, 'Lecstor::Model::Person';
+isa_ok $person, 'Lecstor::Model::Instance::Person';
 is $person->firstname, 'Jason', 'firstname ok';
 
 done_testing();

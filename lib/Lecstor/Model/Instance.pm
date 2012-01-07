@@ -1,4 +1,4 @@
-package Lecstor::Model;
+package Lecstor::Model::Instance;
 use Moose;
 use MooseX::StrictConstructor;
 

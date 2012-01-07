@@ -1,10 +1,10 @@
-package Lecstor::Set::Person;
+package Lecstor::Model::Controller::Person;
 use Moose;
 use Class::Load ('load_class');
 
 # ABSTRACT: interface to person records
 
-extends 'Lecstor::Set';
+extends 'Lecstor::Model::Controller';
 
 use Lecstor::Valid::Person;
 use Lecstor::Error;
@@ -13,11 +13,11 @@ sub resultset_name{ 'Person' }
 
 has model_class => ( isa => 'Str', is => 'ro', builder => '_build_model_class' );
 
-sub _build_model_class{ 'Lecstor::Model::Person' }
+sub _build_model_class{ 'Lecstor::Model::Instance::Person' }
 
 =head1 SYNOPSIS
 
-    my $person_set = Lecstor::Set::Person->new({
+    my $person_set = Lecstor::Model::Controller::Person->new({
         schema => $dbic_schema,
     });
 

@@ -45,7 +45,7 @@ sub inflate_result {
     my $self = shift;
     my $ret = $self->next::method(@_);
     return unless $ret;
-    return Lecstor::Model::Login->new( _record => $ret );
+    return Lecstor::Model::Instance::Login->new( _record => $ret );
 }
  
 
