@@ -1,7 +1,6 @@
 package Lecstor::Model::Login;
 use Moose;
 use DateTime;
-use Carp::Source 'source_cluck';
 extends 'Lecstor::Model';
 
 has '+_record' => (
@@ -23,7 +22,6 @@ returns true if the supplied password is correct
 
 sub check_password{
   my ($self, $password) = @_;
-  source_cluck "check_password - no record" unless $self->_record;
   return 1 if $self->_record->check_password($password);
   if (my $tmppass = $self->temporary_password){
     if ($tmppass->expires < DateTime->now){
