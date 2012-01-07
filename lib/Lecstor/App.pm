@@ -9,13 +9,13 @@ use Class::Load 'load_class';
     my $app = Lecstor::App->new(
         model = Lecstor::App::Model->new(
             schema => Lecstor::Schema->connect($connect_args),
-            template_processor => $tt,
-            product_search_config => {
-                index_path => 'path/to/index/directory',
-                create => 1,
-                truncate => 1,
-            }
         ),
+        template_processor => $tt,
+        product_search_config => {
+            index_path => 'path/to/index/directory',
+            create => 1,
+            truncate => 1,
+        }
     );
 
     my $person_set = $app->model->person;
@@ -29,7 +29,7 @@ sub BUILD{
     $self->update_view;
 }
 
-has model => ( is => 'ro', isa => 'Lecstor::App::Model', required => 0 );
+has model => ( is => 'ro', isa => 'Lecstor::Model', required => 0 );
 
 has session_id => ( is => 'rw', isa => 'Str', required => 0 );
 has login => ( is => 'rw', isa => 'Lecstor::Model::Instance::Login', required => 0 );
@@ -43,6 +43,44 @@ sub validator{
     my $class = $self->validator_class;
     load_class($class);
     return $class->new($args);
+}
+
+=attr template_processor
+
+=cut
+
+has template_processor => ( is => 'ro', isa => 'Object', lazy_build => 1 );
+
+sub _build_template_processor{
+    my ($self) = @_;
+    load_class('Template');
+    return Template->new;
+}
+
+=attr product_search_config
+
+=cut
+
+has product_search_config => ( isa => 'HashRef', is => 'ro', required => 1 );
+
+=attr product_indexer
+
+=cut
+
+has product_indexer => ( isa => 'Lecstor::Lucy::Indexer', is => 'ro', lazy_build => 1 );
+
+sub _build_product_indexer{ Lecstor::Lucy::Indexer->new( $_[0]->product_search_config ) }
+
+=attr product_searcher
+
+=cut
+
+has product_searcher => ( isa => 'Lecstor::Lucy::Searcher', is => 'ro', lazy_build => 1 );
+
+sub _build_product_searcher{
+    return Lecstor::Lucy::Searcher->new(
+        index_path => $_[0]->product_search_config->{index_path}
+    );
 }
 
 has error_class => ( is => 'ro', isa => 'Str', builder => '_build_error_class' );
