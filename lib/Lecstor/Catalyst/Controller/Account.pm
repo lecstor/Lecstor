@@ -64,7 +64,7 @@ sub login :Chained('setup') :PathPart('login') :Args(0){
     my $action = delete $params->{action}; # name of submit button
 
     if ($action){
-        my $v = $app->validator({ params => $params })->class('user');
+        my $v = $app->validator->class('user', params => $params);
         if ( $v->validate ){
             if ( $c->authenticate({ email => $params->{email}, password => $params->{password} }) ){
                 $app->logged_in($c->user->user_object);

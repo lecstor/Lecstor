@@ -6,45 +6,23 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 
 use_ok('Validation::Class');
-
-#--------------------------------------------------------------------
-package Valid::Thing;
-use Validation::Class;
-
-mixin STRING => {
-    min_length => 5,
-    max_length => 10,
-    filters    => [qw/trim strip/]
-};
-
-field required_string_with_error => {
-    mixin => 'STRING',
-    required => 1,
-    error => 'string is invalid',
-};
-
-field required_string_without_error => {
-    mixin => 'STRING',
-    required => 1,
-};
-
-field string_with_error => {
-    mixin => 'STRING',
-    required => 1,
-    error => 'string is invalid',
-};
-
-field string_without_error => {
-    mixin => 'STRING',
-    required => 1,
-};
-
-1;
+use_ok('Valid');
 
 #--------------------------------------------------------------------
 package main;
 
 my $rules;
+
+ok $rules = Valid->new(
+    params => { string_with_error => 'jason123' }
+) => 'new validation object - string ok';
+
+ok $rules->class('Thing')->validate('string_with_error')
+    => 'string_with_error, field specified ok';
+
+ok $rules = Valid->new => 'new validation object - no params ok';
+ok $rules = $rules->class('thing', params => { string_with_error => 'jason123' }), 'validation sub-class with params  ok';
+ok $rules->validate('string_with_error') => 'string_with_error, field specified ok';
 
 #-----------------------
 ok $rules = Valid::Thing->new(
