@@ -32,6 +32,10 @@ use Class::Load 'load_class';
 
 has schema => ( is => 'ro', isa => 'DBIx::Class::Schema', required => 1 );
 
+has product_indexer => ( is => 'ro', isa => 'Object', required => 1 );
+
+has product_searcher => ( is => 'ro', isa => 'Object', required => 1 );
+
 foreach my $set (qw! Action Person User Collection Product Session !){
     my $class = "Lecstor::Model::Controller::$set";
     load_class($class);

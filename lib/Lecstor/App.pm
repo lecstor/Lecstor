@@ -30,9 +30,10 @@ sub BUILD{
 }
 
 has model => ( is => 'ro', isa => 'Lecstor::Model', required => 1 );
+has request => ( is => 'ro', isa => 'Lecstor::Request', required => 1 );
 
-has session_id => ( is => 'rw', isa => 'Str', required => 0 );
-has user => ( is => 'rw', isa => 'Maybe[Object]', required => 0 );
+#has session_id => ( is => 'rw', isa => 'Str', required => 0 );
+#has user => ( is => 'rw', isa => 'Maybe[Object]', required => 0 );
 
 
 =attr validator
@@ -51,13 +52,13 @@ has template_processor => ( is => 'ro', isa => 'Object', required => 1 );
 
 =cut
 
-has product_indexer => ( isa => 'Lecstor::Lucy::Indexer', is => 'ro', required => 1 );
+#has product_indexer => ( isa => 'Lecstor::Lucy::Indexer', is => 'ro', required => 1 );
 
 =attr product_searcher
 
 =cut
 
-has product_searcher => ( isa => 'Object', is => 'ro', required => 1 );
+#has product_searcher => ( isa => 'Object', is => 'ro', required => 1 );
 
 =attr error_class
 
