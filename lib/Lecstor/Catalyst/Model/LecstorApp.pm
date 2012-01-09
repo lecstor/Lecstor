@@ -1,11 +1,11 @@
-package Lecstor::Catalyst::Model::LecstorModel;
+package Lecstor::Catalyst::Model::LecstorApp;
 use strict;
 use warnings;
 use base 'Catalyst::Model';
 use Class::Load 'load_class';
-
+ 
 __PACKAGE__->config( 
-    class => 'Lecstor::App::Container::Model',
+    class => 'Lecstor::App::Container',
 );
 
 sub COMPONENT {
@@ -13,12 +13,8 @@ sub COMPONENT {
     my $class = $cclass->config->{class};
     load_class($class);
     return $class->new(
-        config => {
-            schema => $app->config->{'Model::Schema'},
-            product_search => $app->config->{lecstor}{product_search},
-        }
+        template_processor => Template->new( $app->config->{'View::TT'} ),
     );
 }
 
 1;
-

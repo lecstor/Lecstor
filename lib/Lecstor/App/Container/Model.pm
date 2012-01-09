@@ -1,7 +1,8 @@
 package Lecstor::App::Container::Model;
 use Moose;
 use Bread::Board;
- 
+use Class::Load 'load_class';
+
 extends 'Bread::Board::Container';
 
 has '+name' => ( default => 'Lecstor-Model' );
@@ -28,8 +29,16 @@ has '+name' => ( default => 'Lecstor-Model' );
 has schema => (
     is      => 'ro',
     isa     => 'DBIx::Class::Schema',
-    required => 1,
+    lazy_build => 1,
 );
+
+sub _build_schema{
+    my ($self) = @_;
+    die "we need a schema or schema config" unless $self->config->{schema};
+    my $class = $self->config->{schema}{schema_class};
+    load_class($class);
+    return $class->connect(@{$self->config->{schema}{connect_info}});
+}
 
 =attr config
 
@@ -41,10 +50,10 @@ has config => (
     required => 1,
 );
  
-sub build_container {
+sub BUILD {
     my $self = shift;
 
-    my $c = container 'Lecstor-Model' => as {
+    container $self => as {
  
         service 'schema' => $self->schema;
  
@@ -82,7 +91,6 @@ sub build_container {
   
     };
 
-    return $c;
 }
 
 __PACKAGE__->meta->make_immutable;

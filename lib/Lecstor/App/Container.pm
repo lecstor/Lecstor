@@ -6,13 +6,22 @@ extends 'Bread::Board::Container';
 
 has '+name' => ( default => 'Lecstor' );
 
+=head1 DESCRIPTION
+
+oh how to name the parts.. this module creates the main app L<Bread::Board>
+container which begins as a parameterized container which then creates our
+final container using other containers..
+
 =head1 SYNOPSIS
 
-    my $container = Lecstor::Model::Container->new({
+    my $container1 = Lecstor::App::Container->new({
         template_processor => $tt_instance,
     });
 
-    my $lecstor = $container->build_app();
+    my $container = $container1->create(
+        Model => $model_container,
+        Request => $request_container,
+    );
 
 =attr template_processor
 
@@ -23,15 +32,25 @@ has template_processor => (
     isa     => 'Object',
     required => 1,
 );
- 
-sub build_container {
+
+=attr builder
+
+    $app_c->builder->create({
+        Model => $model_container,
+        Request => $request_container,
+    });
+
+Being a parameterized container we need other containers to be complete.
+
+=cut
+
+has 'builder' => ( isa => 'Object', is => 'ro', lazy_build => 1 );
+
+sub _build_builder {
     my $self = shift;
 
     my $c = container 'Lecstor' => [ 'Model', 'Request' ] => as {
   
-#        service view => $self->view;
-#        service session_id => $self->session_id;
-#        service user => ( block => sub { $self->user } );
         service template_processor => $self->template_processor;
  
         service validator => (
@@ -50,15 +69,22 @@ sub build_container {
                 template_processor => depends_on('template_processor'),
                 validator => depends_on('validator'),
                 error_class => depends_on('error_class'),
-#                session_id => depends_on('session_id'),
-#                user => depends_on('user'),
-#                view => depends_on('view'),
             }
         );
     };
 
     return $c;
 }
+
+=method create
+
+=cut
+
+sub create{
+    my ($self, %args) = @_;
+    return $self->builder->create(%args);
+}
+ 
 
 __PACKAGE__->meta->make_immutable;
 

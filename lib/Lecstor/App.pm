@@ -162,7 +162,7 @@ sub register{
 
 sub logged_in{
     my ($self,$user) = @_;
-    $self->user($user);
+    $self->request->user($user);
     $self->log_action('login');
     $self->update_view;
 }
@@ -173,7 +173,7 @@ sub logged_in{
 
 sub update_view{
     my ($self) = @_;
-    my $user = $self->user;
+    my $user = $self->request->user;
     if ($user){
         my $visitor = {
             logged_in => 1,
@@ -181,7 +181,7 @@ sub update_view{
             name => $user->username,
         };
         $visitor->{name} ||= $user->person->name if $user->person;
-        $self->view({ visitor => $visitor });
+        $self->request->view({ visitor => $visitor });
     }
 }
 

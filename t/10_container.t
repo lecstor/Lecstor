@@ -26,11 +26,7 @@ my $mock_user = bless {}, 'Lecstor::Model::Instance::User';
 
 
 
-ok my $app_container_factory = Lecstor::App::Container->new({
-    template_processor => $mock_tt,
-}), 'app container factory ok';
-
-ok my $model_container_factory = Lecstor::App::Container::Model->new({
+ok my $model_container = Lecstor::App::Container::Model->new({
     schema => Schema,
     config => {
         product_search => {
@@ -39,24 +35,31 @@ ok my $model_container_factory = Lecstor::App::Container::Model->new({
             index_truncate => 1,
         },
     }
-}), 'model container factory ok';
-ok my $model_container = $model_container_factory->build_container => 'model container ok';
+}), 'model container ok';
 
-ok my $empty_app_container = $app_container_factory->build_container => 'empty app container ok';
-
-ok my $request_container_factory = Lecstor::App::Container::Request->new({
+ok my $request_container = Lecstor::App::Container::Request->new({
     session_id => 'abc123',
     user => $mock_user,
     uri => $mock_uri,
-}), 'request container factory ok';
-ok my $request_container = $request_container_factory->build_container => 'request container ok';
+}), 'request container ok';
 
+ok my $app_container_factory = Lecstor::App::Container->new({
+    template_processor => $mock_tt,
+}), 'app container ok';
+
+ok my $empty_app_container = $app_container_factory->builder => 'empty app container ok';
 
 ok my $app_container = $empty_app_container->create(
     Model => $model_container,
     Request => $request_container,
 ), 'app ok';
 
+
+
+ok $app_container = $app_container_factory->create(
+    Model => $model_container,
+    Request => $request_container,
+), 'app container ok';
 
 
 
