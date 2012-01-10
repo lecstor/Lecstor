@@ -18,6 +18,7 @@ sub build_per_context_instance {
     my $args = {
         uri => $ctx->req->uri,
         session_id => $ctx->sessionid,
+        view => { uri => $ctx->req->uri },
     };
     $args->{user} = $ctx->user->user_object if $ctx->user_exists;
 

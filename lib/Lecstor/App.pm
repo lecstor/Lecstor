@@ -32,10 +32,6 @@ sub BUILD{
 has model => ( is => 'ro', isa => 'Lecstor::Model', required => 1 );
 has request => ( is => 'ro', isa => 'Lecstor::Request', required => 1 );
 
-#has session_id => ( is => 'rw', isa => 'Str', required => 0 );
-#has user => ( is => 'rw', isa => 'Maybe[Object]', required => 0 );
-
-
 =attr validator
 
 =cut
@@ -81,10 +77,10 @@ sub log_action{
 
     my $action = {
         type => { name => $type },
-        session => $self->session_id,
+        session => $self->request->session_id,
     };
     $action->{data} = $data if $data;
-    $action->{user} = $self->user->id if $self->user;
+    $action->{user} = $self->request->user->id if $self->request->user;
 
     $self->run_after_request(
         sub{ $self->model->action->create($action); }
@@ -101,26 +97,6 @@ sub run_after_request{
     my ($self, $code) = @_;
     eval{ &$code() };
 }
-
-=attr view
-
-    $app->view({ animals => { dogs => 1 } });
-    # $app->view: { animals => { dogs => 1 } }
-    $app->view({ animals => { cats => 2 } });
-    # $app->view: { animals => { dogs => 1, cats => 2 } }
-    $app->set_view({ foo => bar });
-    # $app->view: { foo => bar });
-    $app->clear_view;
-    # $app->view: undef
-
-Hashref containing view attributes
-
-See L<MooseX::Traits::Attribute::MergeHashRef>
-
-=cut
-
-has view => ( is => 'rw', isa => 'HashRef', traits => [qw(MergeHashRef)] );
-
 
 =method register
 
