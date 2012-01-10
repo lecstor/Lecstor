@@ -1,6 +1,5 @@
 {
     'schema_class' => 'Editor::DB',
-    'traits' => [qw!Testmysqld!],
     'fixture_sets' => {
         'basic' => [],
         'editor' => [
