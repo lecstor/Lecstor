@@ -33,7 +33,7 @@ sub register :Chained('setup') :PathPart('register') :Args(0){
     my $action = delete $params->{action}; # name of submit button
 
     if ($action){
-        my $result = $app->register($params);
+        my $result = $app->model->user->register($params);
         if ($result->isa('Lecstor::Error')){
             $c->stash->{error} = $result;
         } else {

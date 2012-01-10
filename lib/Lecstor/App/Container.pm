@@ -67,7 +67,7 @@ sub _build_builder {
                 model => depends_on('Model/model'),
                 request => depends_on('Request/request'),
                 template_processor => depends_on('template_processor'),
-#                validator => depends_on('validator'),
+                validator => depends_on('validator'),
                 error_class => depends_on('error_class'),
             }
         );

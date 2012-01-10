@@ -34,7 +34,7 @@ has request => ( is => 'ro', isa => 'Lecstor::Request', required => 1 );
 
 =attr validator
 
-#=cut
+=cut
 
 has validator => ( is => 'ro', isa => 'Object', required => 1 );
 
@@ -58,7 +58,7 @@ sub error{
 
 =method log_action
 
-#=cut
+=cut
 
 sub log_action{
     my ($self, $type, $data) = @_;
@@ -70,9 +70,7 @@ sub log_action{
     $action->{data} = $data if $data;
     $action->{user} = $self->request->user->id if $self->request->user;
 
-    $self->run_after_request(
-        sub{ $self->model->action->create($action); }
-    );
+    $self->model->action->create($action);
 }
 
 =method run_after_request
