@@ -46,7 +46,7 @@ sub register :Chained('setup') :PathPart('register') :Args(0){
     $c->stash({
         template => 'account/register.tt',
         params => $params,
-        view => $app->view({ page => { title => 'Register' }}),
+        view => $app->request->view({ page => { title => 'Register' }}),
     });
 }
 
@@ -95,7 +95,7 @@ sub login :Chained('setup') :PathPart('login') :Args(0){
 
     $c->stash({
         template => 'account/login.tt',
-        view => $app->view({ page => { title => 'Log In' }}),
+        view => $app->request->view({ page => { title => 'Log In' }}),
         params => $params,
     });
 

@@ -30,10 +30,7 @@ sub BUILD{
 }
 
 has model => ( is => 'ro', isa => 'Lecstor::Model', required => 1 );
-
-has session_id => ( is => 'rw', isa => 'Str', required => 0 );
-has user => ( is => 'rw', isa => 'Maybe[Object]', required => 0 );
-
+has request => ( is => 'ro', isa => 'Lecstor::Request', required => 1 );
 
 =attr validator
 
@@ -51,13 +48,13 @@ has template_processor => ( is => 'ro', isa => 'Object', required => 1 );
 
 =cut
 
-has product_indexer => ( isa => 'Lecstor::Lucy::Indexer', is => 'ro', required => 1 );
+#has product_indexer => ( isa => 'Lecstor::Lucy::Indexer', is => 'ro', required => 1 );
 
 =attr product_searcher
 
 =cut
 
-has product_searcher => ( isa => 'Object', is => 'ro', required => 1 );
+#has product_searcher => ( isa => 'Object', is => 'ro', required => 1 );
 
 =attr error_class
 
@@ -80,10 +77,10 @@ sub log_action{
 
     my $action = {
         type => { name => $type },
-        session => $self->session_id,
+        session => $self->request->session_id,
     };
     $action->{data} = $data if $data;
-    $action->{user} = $self->user->id if $self->user;
+    $action->{user} = $self->request->user->id if $self->request->user;
 
     $self->run_after_request(
         sub{ $self->model->action->create($action); }
@@ -100,26 +97,6 @@ sub run_after_request{
     my ($self, $code) = @_;
     eval{ &$code() };
 }
-
-=attr view
-
-    $app->view({ animals => { dogs => 1 } });
-    # $app->view: { animals => { dogs => 1 } }
-    $app->view({ animals => { cats => 2 } });
-    # $app->view: { animals => { dogs => 1, cats => 2 } }
-    $app->set_view({ foo => bar });
-    # $app->view: { foo => bar });
-    $app->clear_view;
-    # $app->view: undef
-
-Hashref containing view attributes
-
-See L<MooseX::Traits::Attribute::MergeHashRef>
-
-=cut
-
-has view => ( is => 'rw', isa => 'HashRef', traits => [qw(MergeHashRef)] );
-
 
 =method register
 
@@ -161,7 +138,7 @@ sub register{
 
 sub logged_in{
     my ($self,$user) = @_;
-    $self->user($user);
+    $self->request->user($user);
     $self->log_action('login');
     $self->update_view;
 }
@@ -172,7 +149,7 @@ sub logged_in{
 
 sub update_view{
     my ($self) = @_;
-    my $user = $self->user;
+    my $user = $self->request->user;
     if ($user){
         my $visitor = {
             logged_in => 1,
@@ -180,7 +157,7 @@ sub update_view{
             name => $user->username,
         };
         $visitor->{name} ||= $user->person->name if $user->person;
-        $self->view({ visitor => $visitor });
+        $self->request->view({ visitor => $visitor });
     }
 }
 

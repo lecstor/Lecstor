@@ -6,13 +6,15 @@ use namespace::autoclean;
 
 # ABSTRACT: Lecstor Catalyst customisations
 
+$ENV{CATALYST_CONFIG_LOCAL_SUFFIX} ||= $ENV{LECSTOR_DEPLOY};
+
 sub lecstor{ shift->model('Lecstor', @_) }
 
 sub controllers{qw( Account )}
 
 sub views{qw( TT )}
 
-sub models{qw( Lecstor Schema )}
+sub models{qw( LecstorApp LecstorRequest LecstorModel Lecstor )}
 
 after 'setup_components' => sub {
     my $class = shift;
