@@ -44,18 +44,6 @@ has validator => ( is => 'ro', isa => 'Object', required => 1 );
 
 has template_processor => ( is => 'ro', isa => 'Object', required => 1 );
 
-=attr product_indexer
-
-=cut
-
-#has product_indexer => ( isa => 'Lecstor::Lucy::Indexer', is => 'ro', required => 1 );
-
-=attr product_searcher
-
-=cut
-
-#has product_searcher => ( isa => 'Object', is => 'ro', required => 1 );
-
 =attr error_class
 
 =cut
