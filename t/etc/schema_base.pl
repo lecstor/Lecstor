@@ -1,13 +1,12 @@
 {
     'schema_class' => 'Lecstor::Schema',
-    'traits' => [qw!Testmysqld!],
     'fixture_sets' => {
         'user' => [
             'UserRole' => [
-                ['name'],
-                ['Role1'],
-                ['Role2'],
-                ['Role3'],
+                ['name','created'],
+                ['Role1', '2012-01-01 13:00:00'],
+                ['Role2', '2012-01-01 13:00:00'],
+                ['Role3', '2012-01-01 13:00:00'],
             ],
         ],
     },

@@ -1,6 +1,9 @@
 package Lecstor::Model::Instance::User;
 use Moose;
 use DateTime;
+use Scalar::Util 'blessed';
+use Lecstor::X;
+
 extends 'Lecstor::Model::Instance';
 
 has '+_record' => (
@@ -45,6 +48,7 @@ sub check_password{
 sub set_temporary_password{
     my ($self, $args) = @_;
     $args->{user} = $self->id;
+    $args->{created} = DateTime->now( time_zone => 'local' );
     return $self->related_resultset('temporary_password')->create($args);
 }
 
@@ -60,14 +64,29 @@ sub set_temporary_password{
     @roles = $user->add_to_roles($dbic_role_result);
     @roles = $user->add_to_roles($dbic_role_result, $dbic_role_result2);
 
+The role to be added must already exist.
+
 =cut
 
 sub add_to_roles{
     my ($self, @roles) = @_;
     my @objects;
+    my $role_rs = $self->_record->result_source->schema->resultset('UserRole');
+    my $role_map_rs = $self->_record->result_source->schema->resultset('UserRoleMap');
     foreach my $role (@roles){
-        $role = { name => $role } unless ref $role;
-        push(@objects, $self->_record->add_to_roles($role) );
+        unless( blessed $role && $role->isa('DBIx::Class::Row') ){
+            $role = { name => $role } unless ref $role;
+            my $record = $role_rs->search($role)->single;
+            Lecstor::X->throw( $role->{name} . " does not exist" )
+                unless $record;
+            $role = $record;
+        }
+        $role_map_rs->create({
+            created => DateTime->now( time_zone => 'local' ),
+            user => $self->_record->id,
+            role => $role->id,
+        });
+        push(@objects, $role);
     }
     return @objects;
 }

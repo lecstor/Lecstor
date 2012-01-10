@@ -96,6 +96,12 @@ note('Test roles'); {
 
     my @roles;
 
+    eval{ $user->add_to_roles('NoRole') };
+    ok $@, 'non-existent role not added ok';
+    is $@->message, 'NoRole does not exist', 'exception message ok';
+
+    ok my $role = ResultSet('UserRole')->find({ name => 'Role1' }) => 'Role1 exists ok';
+
     ok @roles = $user->add_to_roles('Role1'), 'add role by name ok';
     isa_ok $roles[0], 'Lecstor::Schema::Result::UserRole';
     is $roles[0]->name, 'Role1', 'role name ok';
