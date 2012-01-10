@@ -79,14 +79,68 @@ sub BUILD {
             }
         );
 
-        service model => (
-            class        => 'Lecstor::Model',
+        service validator => (
+            class        => 'Lecstor::Valid',
+            lifecycle    => 'Singleton',
+        );
+
+        service current_user_id => (
+            block => sub{
+                my $s = shift;
+                my $request = $s->param('request');
+                return $request->user ? $request->user->id : undef;
+            },
+            dependencies => {
+                request => depends_on('../Request/request'),
+            },
+        );
+ 
+        service current_session_id => (
+            block => sub{
+                my $s = shift;
+                return $s->param('request')->session_id;
+            },
+            dependencies => {
+                request => depends_on('../Request/request'),
+            },
+        );
+ 
+        foreach my $ctrl (qw! Action Person Collection Product Session !){
+            my $class = "Lecstor::Model::Controller::$ctrl";
+            my $method = lc($ctrl);
+            service $method => (
+                class        => $class,
+                lifecycle    => 'Singleton',
+                dependencies => {
+                    schema => depends_on('schema'),
+                    validator => depends_on('validator'),
+                    current_user_id => depends_on('current_user_id'),
+                    current_session_id => depends_on('current_session_id'),
+                }
+            );
+        }
+
+        service user => (
+            class => 'Lecstor::Model::Controller::User',
             lifecycle    => 'Singleton',
             dependencies => {
                 schema => depends_on('schema'),
-                product_indexer => depends_on('product_indexer'),
-                product_searcher => depends_on('product_searcher'),
+                validator => depends_on('validator'),
+                person_ctrl => depends_on('person'),
+                action_ctrl => depends_on('action'),
+                current_user_id => depends_on('current_user_id'),
+                current_session_id => depends_on('current_session_id'),
             }
+        );
+ 
+        service model => (
+            class        => 'Lecstor::Model',
+            lifecycle    => 'Singleton',
+            dependencies => [
+                depends_on('schema'), depends_on('product_indexer'), depends_on('product_searcher'),
+                depends_on('action'), depends_on('person'), depends_on('user'),
+                depends_on('collection'), depends_on('product'), depends_on('session'),
+            ]
         );
   
     };

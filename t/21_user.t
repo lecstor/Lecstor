@@ -17,6 +17,11 @@ fixtures_ok 'user'
     => 'installed the product fixtures from configuration files';
 
 use_ok('Lecstor::Model::Controller::User');
+use_ok('Lecstor::Model::Controller::Person');
+use_ok('Lecstor::Model::Controller::Action');
+use_ok('Lecstor::Valid');
+
+my $valid = Lecstor::Valid->new;
 
 my $now = DateTime->now;
 my $tomorrow = $now->clone->add( days => 1 );
@@ -24,8 +29,22 @@ my $yesterday = $now->clone->subtract( days => 1 );
 is $tomorrow->dmy, '02-01-2012', 'tomorrow date ok';
 is $yesterday->dmy, '31-12-2011', 'yesterday date ok';
 
+ok my $person_ctrl = Lecstor::Model::Controller::Person->new(
+    schema => Schema,
+    validator => $valid,
+), 'get person_set ok';
 
-ok my $user_set = Lecstor::Model::Controller::User->new( schema => Schema ), 'get user_set ok';
+ok my $action_ctrl = Lecstor::Model::Controller::Action->new(
+    schema => Schema,
+    validator => $valid,
+), 'get person_set ok';
+
+ok my $user_set = Lecstor::Model::Controller::User->new(
+    schema => Schema,
+    person_ctrl => $person_ctrl,
+    action_ctrl => $action_ctrl,
+    validator => $valid,
+), 'get user_set ok';
 
 my ($user, $user2, $user3, $user4);
 
