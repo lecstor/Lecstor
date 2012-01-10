@@ -88,6 +88,7 @@ sub create{
         unless ref $args eq 'HASH';
 
     my $rels = $self->relations($args);
+    $self->process_column($rels);
     $self->process_single($rels);
 
     my $trxn = sub{
@@ -123,6 +124,7 @@ sub update{
     }
 
     my $rels = $self->relations($args);
+    $self->process_column($rels);
     $self->process_single($rels);
 
     my $trxn = sub{
@@ -167,8 +169,6 @@ sub relations{
             die "field $field has no relationship or column? ".$args->{$field};
         }
     }
-#use Data::Dumper;
-#warn Dumper(\%rels);
 
     return \%rels;
 }
@@ -181,6 +181,38 @@ sub split_value{
         $value = [];
     }
     return $value;
+}
+
+=method truncate
+
+avoid issues with find_or_create and MySQL silently truncating inserted
+values by truncating them ourself.
+
+=cut
+
+sub truncate{
+    my ($self, $value, $info) = @_;
+    return $value unless $value && $info->{size} && $info->{data_type} =~ /^VAR(?:CHAR)?$/;
+    return substr($value, 0, $info->{size});
+}
+
+=method process_column
+
+truncate string values with set size.
+
+=cut
+
+sub process_column{
+    my ($self, $rels) = @_;
+    my $columns = $rels->{column};
+
+    foreach my $field (keys %$columns){
+        $columns->{$field} = $self->truncate(
+            $columns->{$field},
+            $self->result_source->column_info($field)
+        );
+    }
+
 }
 
 sub process_single{
@@ -201,8 +233,7 @@ sub process_single{
                 my $rel_source = $self->result_source->related_source($field);
                 my $rel_rs = $rel_source->resultset;
                 my $column = $self->row_schema->{$field}{value} || $self->row_schema->{_default}{value};
-                my $size = $rel_source->column_info($column)->{size};
-                $value = substr($value, 0, $size) if $size;
+                $value = $self->truncate($value, $rel_source->column_info($column));
                 my $result = $rel_rs->find_or_create({ $column => $value });
                 $rels->{column}{$field} = $result->id;
             }
@@ -225,21 +256,22 @@ sub process_multi{
         my %existing = map{ $_->id => 1 } $row->$field;
 
         my $rel_source = $self->result_source->related_source($field);
-        my $size = $rel_source->column_info($column)->{size};
 
         foreach my $item ( @$value ){
             try{
                 my $record;
                 if (ref $item){
-                    $item->{$column} = substr($item->{$column}, 0, $size) if $size;
+                    $item->{$column} = $self->truncate($item->{$column}, $rel_source->column_info($column));
                     $record = $row->$add_method($item);
                 } else {
-                    $item = substr($item, 0, $size) if $size;
+                    $item = $self->truncate($item, $rel_source->column_info($column));
                     $record = $row->$add_method({ $column => $item });
                 }
                 delete $existing{$record->id};
             } catch {
-                die $_ unless /Duplicate entry/;
+                # ignore errors caused by adding something that already exists
+                # not cross-db compatible; MySQL & SQLite covered..
+                die $_ unless /Duplicate entry|not unique/i;
             }
         }
 
@@ -272,13 +304,15 @@ sub process_m2m{
         my %existing = map{ $_->id => 1 } $row->$field;
 
         foreach my $item (@$value){
-            $item = substr($item, 0, $size) if $size;
+            $item = $self->truncate($item, $rel_rel_source->column_info($column));
             my $result = $rel_rel_rs->find_or_create({ $column => $item });
             delete $existing{$result->id};
             try{
                 $row->$add_method($result);
             } catch {
-                die $_ unless /Duplicate entry/;
+                # ignore errors caused by adding something that already exists
+                # not cross-db compatible; MySQL & SQLite covered..
+                die $_ unless /Duplicate entry|not unique/i;
             }
         }
         $row->$rel->search({ $foreign_rel => { 'in' => [keys %existing] }})->delete;
