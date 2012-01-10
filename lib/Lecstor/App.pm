@@ -34,7 +34,7 @@ has request => ( is => 'ro', isa => 'Lecstor::Request', required => 1 );
 
 =attr validator
 
-=cut
+#=cut
 
 has validator => ( is => 'ro', isa => 'Object', required => 1 );
 
@@ -58,7 +58,7 @@ sub error{
 
 =method log_action
 
-=cut
+#=cut
 
 sub log_action{
     my ($self, $type, $data) = @_;
@@ -79,7 +79,7 @@ sub log_action{
 
 NOT IMPLEMENTED - executes code immediately
 
-=cut
+#=cut
 
 sub run_after_request{
     my ($self, $code) = @_;
@@ -88,7 +88,7 @@ sub run_after_request{
 
 =method register
 
-=cut
+#=cut
 
 sub register{
     my ($self,$params) = @_;

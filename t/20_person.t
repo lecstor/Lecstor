@@ -14,8 +14,14 @@ use Test::DBIx::Class {
 }, 'Person';
 
 use_ok('Lecstor::Model::Controller::Person');
+use_ok('Lecstor::Valid');
 
-ok my $person_set = Lecstor::Model::Controller::Person->new( schema => Schema ), 'get person_set ok';
+my $valid = Lecstor::Valid->new;
+
+ok my $person_set = Lecstor::Model::Controller::Person->new(
+    schema => Schema,
+    validator => $valid,
+), 'get person_set ok';
 
 ok my $person = $person_set->create({
     firstname => 'Jason',

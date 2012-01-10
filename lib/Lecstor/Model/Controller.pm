@@ -32,6 +32,24 @@ has rs     => (
 
 sub _build_rs{ $_[0]->schema->resultset($_[0]->resultset_name) }
 
+=attr validator
+
+=cut
+
+has validator => ( is => 'ro', isa => 'Object', required => 1 );
+
+=attr current_user_id
+
+=cut
+
+has current_user_id => ( is => 'ro', isa => 'Maybe[Int]' );
+
+=attr current_session_id
+
+=cut
+
+has current_session_id => ( is => 'ro', isa => 'Str' );
+
 =method create
 
 =cut

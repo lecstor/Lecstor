@@ -30,23 +30,15 @@ use Class::Load 'load_class';
 
 =cut
 
-has schema => ( is => 'ro', isa => 'DBIx::Class::Schema', required => 1 );
+#has schema => ( is => 'ro', isa => 'DBIx::Class::Schema', required => 1 );
 
-has product_indexer => ( is => 'ro', isa => 'Object', required => 1 );
+has [qw! product_indexer product_searcher !] => (
+    is => 'ro', isa => 'Object', required => 1
+);
 
-has product_searcher => ( is => 'ro', isa => 'Object', required => 1 );
-
-foreach my $set (qw! Action Person User Collection Product Session !){
-    my $class = "Lecstor::Model::Controller::$set";
-    load_class($class);
-    has lc($set) => (
-        isa => 'Object', is => 'ro', lazy => 1,
-        default => sub {
-            my ($self) = @_;
-            return $class->new( schema => $self->schema );
-        }
-    );
-}
+has [qw! action person user collection product session !] => (
+    is => 'ro', isa => 'Lecstor::Model::Controller', required => 1
+);
 
 __PACKAGE__->meta->make_immutable;
 

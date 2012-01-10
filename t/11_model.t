@@ -21,12 +21,38 @@ fixtures_ok 'login'
 use_ok('Lecstor::Model');
 use_ok('Lecstor::Lucy::Indexer');
 use_ok('Lecstor::Lucy::Searcher');
+use_ok('Lecstor::Model::Controller::Action');
+use_ok('Lecstor::Model::Controller::Person');
+use_ok('Lecstor::Model::Controller::User');
+use_ok('Lecstor::Model::Controller::Collection');
+use_ok('Lecstor::Model::Controller::Product');
+use_ok('Lecstor::Model::Controller::Session');
+use_ok('Lecstor::Valid');
+
 use_ok('Test::AppBasic');
+
+my $valid = Lecstor::Valid->new;
+
+my %ctrls;
+foreach my $ctrl (qw! Action Person Collection Product Session !){
+    my $class = 'Lecstor::Model::Controller::'. ucfirst($ctrl);
+    $ctrls{lc($ctrl)} = $class->new(
+        schema => Schema,
+        validator => $valid,
+    );
+}
+
+$ctrls{user} = Lecstor::Model::Controller::User->new(
+    schema => Schema,
+    validator => $valid,
+    action_ctrl => $ctrls{action},
+    person_ctrl => $ctrls{person},
+);
 
 my $lucy_index = tempdir( CLEANUP => 1);
 
 my $app = Lecstor::Model->new(
-    schema => Schema,
+    %ctrls,
     product_indexer => Lecstor::Lucy::Indexer->new(
         index_path => $lucy_index,
         create => 1,
