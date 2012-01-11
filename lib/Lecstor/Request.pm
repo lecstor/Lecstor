@@ -7,11 +7,13 @@ use Class::Load 'load_class';
     my $request = Lecstor::Request->new(
         uri => $uri,
         session_id => $session_id,
-        user => $user,
     );
 
 =cut
 
+sub BUILD{
+    shift->update_view;
+}
 =attr uri
 
 =cut
@@ -23,6 +25,17 @@ has uri => ( is => 'ro', isa => 'URI' );
 =cut
 
 has session_id => ( is => 'rw', isa => 'Str', required => 1 );
+
+=attr user
+
+=cut
+
+has user => (
+    is => 'rw', isa => 'Lecstor::Model::Instance::User', lazy_build => 1,
+#    trigger => \&update_view,    
+);
+
+sub _build_user{ Lecstor::Model::Instance::User->new }
 
 =attr view
 
@@ -56,7 +69,7 @@ sub update_view{
     my $user = $self->user;
     if ($user){
         my $visitor = {
-          %{$self->view->{visitor}},
+          %{$self->view->{visitor} || {}},
           logged_in => 1,
           email => $user->email,
           name => $user->username,

@@ -4,17 +4,18 @@ use MooseX::Params::Validate;
 use MooseX::StrictConstructor;
 use Class::Load 'load_class';
 
-=attr current_user_id
+=method current_user
 
 =cut
 
-has current_user_id => ( is => 'ro', isa => 'Maybe[Int]' );
+sub current_user{ shift->request->user }
 
-=attr current_session_id
+=method current_session_id
 
 =cut
 
-has current_session_id => ( is => 'ro', isa => 'Str' );
+sub current_session_id{ shift->request->session_id }
+
 
 with 'Lecstor::Role::ActionLogger';
 
@@ -41,7 +42,23 @@ with 'Lecstor::Role::ActionLogger';
 =cut
 
 has model => ( is => 'ro', isa => 'Lecstor::Model', required => 1 );
+
+=attr request
+
+=cut
+
 has request => ( is => 'ro', isa => 'Lecstor::Request', required => 1 );
+
+# crap
+# the user needs to be able to change from undef to set.
+# the user should be simple to provide to any/all classes
+# the app container should have the lifetime of the application so no
+#  rw parts
+# SO IT MUST BE IN THE REQUEST OBJECT!
+# is there a good reason to have multiple request objects to support
+#  anonymous vs user?
+# if we change the request object we lose references to it? so better
+#  to only change an atribute in it.
 
 =attr validator
 

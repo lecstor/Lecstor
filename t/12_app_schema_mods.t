@@ -30,8 +30,9 @@ use_ok('Lecstor::Model::Controller::User');
 use_ok('Lecstor::Model::Controller::Collection');
 use_ok('Lecstor::Model::Controller::Product');
 use_ok('Lecstor::Model::Controller::Session');
+use_ok('Lecstor::Model::Instance::User');
 use_ok('Lecstor::Valid');
-use_ok('Lecstor::Request::Visitor');
+use_ok('Lecstor::Request');
 
 use_ok('App::Model::Controller::Person');
 
@@ -45,12 +46,14 @@ foreach my $ctrl (qw! Action Collection Product Session !){
     $ctrls{lc($ctrl)} = $class->new(
         schema => Schema,
         validator => $valid,
+    current_user => Lecstor::Model::Instance::User->new,
     );
 }
 
 $ctrls{person} = App::Model::Controller::Person->new(
     schema => Schema,
     validator => $valid,
+    current_user => Lecstor::Model::Instance::User->new,
 );
 
 $ctrls{user} = Lecstor::Model::Controller::User->new(
@@ -58,7 +61,8 @@ $ctrls{user} = Lecstor::Model::Controller::User->new(
     validator => $valid,
     action_ctrl => $ctrls{action},
     person_ctrl => $ctrls{person},
-    request => Lecstor::Request::Visitor->new( session_id => 'testing123' ),
+    request => Lecstor::Request->new( session_id => 'testing123' ),
+    current_user => Lecstor::Model::Instance::User->new,
 );
 
 my $lucy_index = tempdir( CLEANUP => 1);

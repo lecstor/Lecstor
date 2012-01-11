@@ -1,7 +1,7 @@
 package Lecstor::Role::ActionLogger;
 use Moose::Role;
 
-requires 'current_user_id', 'current_session_id';
+requires 'current_user', 'current_session_id';
 
 has action_ctrl => ( isa => 'Lecstor::Model::Controller', is => 'ro', required => 1 );
 
@@ -18,7 +18,7 @@ sub log_action{
     };
     $action->{data} = $data if $data;
 #    $action->{user} = $self->request->user->id if $self->request->user;
-    $action->{user} = $self->current_user_id;
+    $action->{user} = $self->current_user->id if $self->current_user;
 
     $self->action_ctrl->create($action);
 }

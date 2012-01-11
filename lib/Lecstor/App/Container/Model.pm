@@ -93,8 +93,8 @@ sub BUILD {
                 dependencies => {
                     schema => depends_on('schema'),
                     validator => depends_on('validator'),
-                    current_user_id => depends_on('../current_user_id'),
-                    current_session_id => depends_on('../current_session_id'),
+                    current_user => depends_on('../Request/user'),
+                    current_session_id => depends_on('../Request/session_id'),
                 }
             );
         }
@@ -108,8 +108,8 @@ sub BUILD {
                 request => depends_on('../Request/request'),
                 person_ctrl => depends_on('person'),
                 action_ctrl => depends_on('action'),
-                current_user_id => depends_on('../current_user_id'),
-                current_session_id => depends_on('../current_session_id'),
+                current_user => depends_on('../Request/user'),
+                current_session_id => depends_on('../Request/session_id'),
             }
         );
  

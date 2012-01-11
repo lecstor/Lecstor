@@ -42,7 +42,11 @@ has validator => ( is => 'ro', isa => 'Object', required => 1 );
 
 =cut
 
-has current_user_id => ( is => 'ro', isa => 'Maybe[Int]' );
+has current_user => (
+    is => 'ro',
+    isa => 'Lecstor::Model::Instance::User',
+    required => 1
+);
 
 =attr current_session_id
 

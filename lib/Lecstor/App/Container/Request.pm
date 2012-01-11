@@ -1,7 +1,8 @@
 package Lecstor::App::Container::Request;
 use Moose;
 use Bread::Board;
- 
+use Lecstor::Model::Instance::User;
+
 extends 'Bread::Board::Container';
 
 has '+name' => ( default => 'Lecstor-Request' );
@@ -24,7 +25,21 @@ has uri => ( is => 'ro', isa => 'URI' );
 
 has session_id => ( is => 'rw', isa => 'Str', required => 1 );
 
-has user => ( is => 'rw', isa => 'Lecstor::Model::Instance::User' );
+=attr user
+
+the currently logged in user
+
+L<Lecstor::Model::Instance::User>
+
+=cut
+
+has user => (
+    is => 'ro',
+    isa => 'Lecstor::Model::Instance::User',
+    lazy_build => 1
+);
+
+sub _build_user{ Lecstor::Model::Instance::User->new }
 
 =attr view
 
@@ -53,28 +68,17 @@ sub BUILD {
         service uri => $self->uri;
         service session_id => $self->session_id;
         service view => $self->view;
+        service user => $self->user;
 
-        if ($self->user){
-            service user => $self->user;
-            service request => (
-                class        => 'Lecstor::Request::User',
-                dependencies => [
-                    depends_on('uri'),
-                    depends_on('session_id'),
-                    depends_on('user'),
-                    depends_on('view'),
-                ]
-            );
-        } else {
-            service request => (
-                class        => 'Lecstor::Request::Visitor',
-                dependencies => [
-                    depends_on('uri'),
-                    depends_on('session_id'),
-                    depends_on('view'),
-                ]
-            );
-        }
+        service request => (
+            class        => 'Lecstor::Request',
+            dependencies => [
+                depends_on('uri'),
+                depends_on('session_id'),
+                depends_on('view'),
+                depends_on('user'),
+            ],
+        );
     };
 }
 

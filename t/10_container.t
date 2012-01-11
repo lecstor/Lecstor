@@ -104,4 +104,14 @@ TODO: {
     ok $user, 'register ok';
 }
 
+# all objects that need it have a reference to the current user object
+# that may actually be an empty object if there is no logged in user.
+# to log in a user we set the _record attribute in that object.
+
+ok !$app->model->action->current_user, 'no current user';
+ok $app->model->user->login($user), 'login user ok';
+ok $app->model->action->current_user, 'current user ok';
+is $app->model->action->current_user->username, 'lecstor2', 'current user username ok';
+is $app->request->user->username, 'lecstor2', 'request->user->username ok';
+
 done_testing();

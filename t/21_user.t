@@ -19,6 +19,7 @@ fixtures_ok 'user'
 use_ok('Lecstor::Model::Controller::User');
 use_ok('Lecstor::Model::Controller::Person');
 use_ok('Lecstor::Model::Controller::Action');
+use_ok('Lecstor::Model::Instance::User');
 use_ok('Lecstor::Valid');
 use_ok('Lecstor::Request');
 
@@ -33,11 +34,13 @@ is $yesterday->dmy, '31-12-2011', 'yesterday date ok';
 ok my $person_ctrl = Lecstor::Model::Controller::Person->new(
     schema => Schema,
     validator => $valid,
+    current_user => Lecstor::Model::Instance::User->new,
 ), 'get person_set ok';
 
 ok my $action_ctrl = Lecstor::Model::Controller::Action->new(
     schema => Schema,
     validator => $valid,
+    current_user => Lecstor::Model::Instance::User->new,
 ), 'get person_set ok';
 
 ok my $user_set = Lecstor::Model::Controller::User->new(
@@ -46,6 +49,7 @@ ok my $user_set = Lecstor::Model::Controller::User->new(
     action_ctrl => $action_ctrl,
     validator => $valid,
     request => Lecstor::Request->new( session_id => 'testing123' ),
+    current_user => Lecstor::Model::Instance::User->new,
 ), 'get user_set ok';
 
 my ($user, $user2, $user3, $user4);

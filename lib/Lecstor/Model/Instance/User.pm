@@ -4,9 +4,12 @@ use DateTime;
 use Scalar::Util 'blessed';
 use Lecstor::X;
 
+use overload '""' => sub{ shift->_record ? 1 : 0 };
+
 extends 'Lecstor::Model::Instance';
 
-has '+_record' => (
+has '_record' => (
+    isa => 'Object', is => 'rw',
     handles => [qw!
         id created modified active
         username email person password
@@ -14,6 +17,17 @@ has '+_record' => (
         roles
     !]
 );
+
+=method set_record
+
+    $user->set_record($other_user);
+
+=cut
+
+sub set_record{
+    my ($self, $user) = @_;
+    $self->_record($user->_record);
+}
 
 =method check_password
 

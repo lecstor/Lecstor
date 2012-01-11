@@ -7,7 +7,8 @@ use Lecstor::Model::Controller::Person;
 use Lecstor::Model::Controller::User;
 use Lecstor::Model::Controller::Collection;
 use Lecstor::Model::Controller::Product;
-use Lecstor::Request::Visitor;
+use Lecstor::Model::Instance::User;
+use Lecstor::Request;
 
 has schema => ( isa => 'DBIx::Class::Schema', is => 'ro' );
 
@@ -22,6 +23,7 @@ foreach my $set (qw! action person collection product !){
             return $class->new(
                 schema => $self->schema,
                 validator => $valid,
+                current_user => Lecstor::Model::Instance::User->new,
             );
         }
     );
@@ -36,7 +38,8 @@ has user => (
             validator => $valid,
             action_ctrl => $self->action,
             person_ctrl => $self->person,
-            request => Lecstor::Request::Visitor->new( session_id => 'testing123' ),
+            request => Lecstor::Request->new( session_id => 'testing123' ),
+            current_user => Lecstor::Model::Instance::User->new,
         );
     }
 );

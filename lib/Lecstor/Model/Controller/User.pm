@@ -64,9 +64,9 @@ around 'create' => sub{
 
 sub login{
     my ($self,$user) = @_;
-    $self->request->user($user);
+    $self->request->user->set_record($user);
+    $self->request->update_view;
     $self->log_action('login');
-    $self->update_view;
 }
 
 =method register
