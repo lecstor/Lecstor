@@ -74,7 +74,7 @@ ok my $user = $app->model->user->create({
     password => 'abcd1234',
 }) => 'create user ok';
 
-ok $user->person($person->id);
+ok $user->person($person->id), 'set user person ok';
 $user->update;
 
 $user = $app->model->user->register({

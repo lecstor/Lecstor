@@ -4,6 +4,20 @@ use MooseX::Params::Validate;
 use MooseX::StrictConstructor;
 use Class::Load 'load_class';
 
+=attr current_user_id
+
+=cut
+
+has current_user_id => ( is => 'ro', isa => 'Maybe[Int]' );
+
+=attr current_session_id
+
+=cut
+
+has current_session_id => ( is => 'ro', isa => 'Str' );
+
+with 'Lecstor::Role::ActionLogger';
+
 =head1 SYNOPSIS
 
     my $app = Lecstor::App->new(
@@ -20,14 +34,11 @@ use Class::Load 'load_class';
 
     my $person_set = $app->model->person;
 
+=cut
+
 =attr model
 
 =cut
-
-sub BUILD{
-    my ($self) = @_;
-    $self->update_view;
-}
 
 has model => ( is => 'ro', isa => 'Lecstor::Model', required => 1 );
 has request => ( is => 'ro', isa => 'Lecstor::Request', required => 1 );
@@ -58,7 +69,7 @@ sub error{
 
 =method log_action
 
-=cut
+#=cut
 
 sub log_action{
     my ($self, $type, $data) = @_;
@@ -118,34 +129,7 @@ sub register{
     return $result;
 }
 
-=method logged_in
-
 =cut
-
-sub logged_in{
-    my ($self,$user) = @_;
-    $self->request->user($user);
-    $self->log_action('login');
-    $self->update_view;
-}
-
-=method update_view
-
-=cut
-
-sub update_view{
-    my ($self) = @_;
-    my $user = $self->request->user;
-    if ($user){
-        my $visitor = {
-            logged_in => 1,
-            email => $user->email,
-            name => $user->username,
-        };
-        $visitor->{name} ||= $user->person->name if $user->person;
-        $self->request->view({ visitor => $visitor });
-    }
-}
 
 __PACKAGE__->meta->make_immutable;
 

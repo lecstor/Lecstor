@@ -67,7 +67,8 @@ sub login :Chained('setup') :PathPart('login') :Args(0){
         my $v = $app->validator->class('user', params => $params);
         if ( $v->validate ){
             if ( $c->authenticate({ email => $params->{email}, password => $params->{password} }) ){
-                $app->logged_in($c->user->user_object);
+                #$app->logged_in($c->user->user_object);
+                $app->model->user->login($c->user->user_object);
                 $c->stash->{success} = 1;
                 my $recent = $c->session->{recent_uri}[0];
                 my $uri = $recent ? $recent->path_query : $c->uri_for('/');

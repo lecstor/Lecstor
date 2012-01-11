@@ -21,6 +21,14 @@ sub _build_model_class{ 'Lecstor::Model::Instance::User' }
 
 has person_ctrl => ( isa => 'Lecstor::Model::Controller', is => 'ro', required => 1 );
 
+=attr request
+
+L<Lecstor::Request>
+
+=cut
+
+has request => ( isa => 'Lecstor::Request', is => 'ro', required => 1 );
+
 =head1 SYNOPSIS
 
     my $user_set = Lecstor::Model::Controller::User->new({
@@ -49,6 +57,17 @@ around 'create' => sub{
     load_class($model_class);
     return $model_class->new( _record => $self->$orig($params) );
 };
+
+=method login
+
+=cut
+
+sub login{
+    my ($self,$user) = @_;
+    $self->request->user($user);
+    $self->log_action('login');
+    $self->update_view;
+}
 
 =method register
 

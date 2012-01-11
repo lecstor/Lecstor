@@ -84,27 +84,6 @@ sub BUILD {
             lifecycle    => 'Singleton',
         );
 
-        service current_user_id => (
-            block => sub{
-                my $s = shift;
-                my $request = $s->param('request');
-                return $request->user ? $request->user->id : undef;
-            },
-            dependencies => {
-                request => depends_on('../Request/request'),
-            },
-        );
- 
-        service current_session_id => (
-            block => sub{
-                my $s = shift;
-                return $s->param('request')->session_id;
-            },
-            dependencies => {
-                request => depends_on('../Request/request'),
-            },
-        );
- 
         foreach my $ctrl (qw! Action Person Collection Product Session !){
             my $class = "Lecstor::Model::Controller::$ctrl";
             my $method = lc($ctrl);
@@ -114,8 +93,8 @@ sub BUILD {
                 dependencies => {
                     schema => depends_on('schema'),
                     validator => depends_on('validator'),
-                    current_user_id => depends_on('current_user_id'),
-                    current_session_id => depends_on('current_session_id'),
+                    current_user_id => depends_on('../current_user_id'),
+                    current_session_id => depends_on('../current_session_id'),
                 }
             );
         }
@@ -126,10 +105,11 @@ sub BUILD {
             dependencies => {
                 schema => depends_on('schema'),
                 validator => depends_on('validator'),
+                request => depends_on('../Request/request'),
                 person_ctrl => depends_on('person'),
                 action_ctrl => depends_on('action'),
-                current_user_id => depends_on('current_user_id'),
-                current_session_id => depends_on('current_session_id'),
+                current_user_id => depends_on('../current_user_id'),
+                current_session_id => depends_on('../current_session_id'),
             }
         );
  

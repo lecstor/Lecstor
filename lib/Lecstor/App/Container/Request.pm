@@ -49,14 +49,15 @@ has view => ( is => 'rw', isa => 'HashRef', default => sub{{}} );
 sub BUILD {
     my $self = shift;
 
-    if ($self->user){
-        container $self => as {
-            service uri => $self->uri;
-            service session_id => $self->session_id;
+    container $self => as {
+        service uri => $self->uri;
+        service session_id => $self->session_id;
+        service view => $self->view;
+
+        if ($self->user){
             service user => $self->user;
-            service view => $self->view;
             service request => (
-                class        => 'Lecstor::Request',
+                class        => 'Lecstor::Request::User',
                 dependencies => [
                     depends_on('uri'),
                     depends_on('session_id'),
@@ -64,22 +65,17 @@ sub BUILD {
                     depends_on('view'),
                 ]
             );
-        };
-    } else {
-        container $self => as {
-            service uri => $self->uri;
-            service session_id => $self->session_id;
-            service view => $self->view;
+        } else {
             service request => (
-                class        => 'Lecstor::Request',
+                class        => 'Lecstor::Request::Visitor',
                 dependencies => [
                     depends_on('uri'),
                     depends_on('session_id'),
                     depends_on('view'),
                 ]
             );
-        };
-    }
+        }
+    };
 }
 
 __PACKAGE__->meta->make_immutable;

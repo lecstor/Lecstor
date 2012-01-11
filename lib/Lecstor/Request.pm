@@ -24,12 +24,6 @@ has uri => ( is => 'ro', isa => 'URI' );
 
 has session_id => ( is => 'rw', isa => 'Str', required => 1 );
 
-=attr user
-
-=cut
-
-has user => ( is => 'rw', isa => 'Lecstor::Model::Instance::User', required => 0 );
-
 =attr view
 
     $app->view({ animals => { dogs => 1 } });
@@ -52,6 +46,25 @@ has view => (
     traits => [qw(MergeHashRef)],
     default => sub{{}},
 );
+
+=method update_view
+
+=cut
+
+sub update_view{
+    my ($self) = @_;
+    my $user = $self->user;
+    if ($user){
+        my $visitor = {
+          %{$self->view->{visitor}},
+          logged_in => 1,
+          email => $user->email,
+          name => $user->username,
+        };
+        $visitor->{name} ||= $user->person->name if $user->person;
+        $self->view({ visitor => $visitor });
+    }
+}
 
 __PACKAGE__->meta->make_immutable;
 

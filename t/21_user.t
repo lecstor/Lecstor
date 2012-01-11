@@ -20,6 +20,7 @@ use_ok('Lecstor::Model::Controller::User');
 use_ok('Lecstor::Model::Controller::Person');
 use_ok('Lecstor::Model::Controller::Action');
 use_ok('Lecstor::Valid');
+use_ok('Lecstor::Request');
 
 my $valid = Lecstor::Valid->new;
 
@@ -44,6 +45,7 @@ ok my $user_set = Lecstor::Model::Controller::User->new(
     person_ctrl => $person_ctrl,
     action_ctrl => $action_ctrl,
     validator => $valid,
+    request => Lecstor::Request->new( session_id => 'testing123' ),
 ), 'get user_set ok';
 
 my ($user, $user2, $user3, $user4);

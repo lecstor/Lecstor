@@ -60,6 +60,27 @@ sub _build_builder {
  
         service error_class => 'Lecstor::Error';
  
+        service current_user_id => (
+            block => sub{
+                my $s = shift;
+                my $request = $s->param('request');
+                return ($request->can('user') && $request->user) ? $request->user->id : undef;
+            },
+            dependencies => {
+                request => depends_on('Request/request'),
+            },
+        );
+ 
+        service current_session_id => (
+            block => sub{
+                my $s = shift;
+                return $s->param('request')->session_id;
+            },
+            dependencies => {
+                request => depends_on('Request/request'),
+            },
+        );
+
         service app => (
             class        => 'Lecstor::App',
             lifecycle    => 'Singleton',
@@ -69,6 +90,9 @@ sub _build_builder {
                 template_processor => depends_on('template_processor'),
                 validator => depends_on('validator'),
                 error_class => depends_on('error_class'),
+                current_user_id => depends_on('current_user_id'),
+                current_session_id => depends_on('current_session_id'),
+                action_ctrl => depends_on('Model/action'),
             }
         );
     };

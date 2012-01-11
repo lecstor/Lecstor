@@ -28,6 +28,7 @@ use_ok('Lecstor::Model::Controller::Collection');
 use_ok('Lecstor::Model::Controller::Product');
 use_ok('Lecstor::Model::Controller::Session');
 use_ok('Lecstor::Valid');
+use_ok('Lecstor::Request::Visitor');
 
 use_ok('Test::AppBasic');
 
@@ -47,6 +48,7 @@ $ctrls{user} = Lecstor::Model::Controller::User->new(
     validator => $valid,
     action_ctrl => $ctrls{action},
     person_ctrl => $ctrls{person},
+    request => Lecstor::Request::Visitor->new( session_id => 'testing123' ),
 );
 
 my $lucy_index = tempdir( CLEANUP => 1);
