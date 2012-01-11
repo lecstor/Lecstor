@@ -49,17 +49,6 @@ has model => ( is => 'ro', isa => 'Lecstor::Model', required => 1 );
 
 has request => ( is => 'ro', isa => 'Lecstor::Request', required => 1 );
 
-# crap
-# the user needs to be able to change from undef to set.
-# the user should be simple to provide to any/all classes
-# the app container should have the lifetime of the application so no
-#  rw parts
-# SO IT MUST BE IN THE REQUEST OBJECT!
-# is there a good reason to have multiple request objects to support
-#  anonymous vs user?
-# if we change the request object we lose references to it? so better
-#  to only change an atribute in it.
-
 =attr validator
 
 =cut
