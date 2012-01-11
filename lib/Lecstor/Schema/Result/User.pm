@@ -42,10 +42,7 @@ __PACKAGE__->many_to_many(roles => 'user_role_maps', 'role');
 __PACKAGE__->might_have( temporary_password => 'Lecstor::Schema::Result::UserTempPass', 'user' );
 
 sub inflate_result {
-    my $self = shift;
-    my $ret = $self->next::method(@_);
-    return unless $ret;
-    return Lecstor::Model::Instance::User->new( _record => $ret );
+    Lecstor::Model::Instance::User->new( _record => shift->next::method(@_) );
 }
  
 
