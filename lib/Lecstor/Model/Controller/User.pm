@@ -33,6 +33,8 @@ has request => ( isa => 'Lecstor::Request', is => 'ro', required => 1 );
 
     my $user_set = Lecstor::Model::Controller::User->new({
         schema => $dbic_schema,
+        current_user => Lecstor::Model::Instance::User->new(),
+        current_session_id => 'acbc123',
     });
 
     my $user = $user_set->create({

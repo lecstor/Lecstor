@@ -24,6 +24,8 @@ use_ok('Lecstor::Valid');
 use_ok('Lecstor::Request');
 
 my $valid = Lecstor::Valid->new;
+my $user = Lecstor::Model::Instance::User->new;
+my $current_session_id = 'test01',
 
 my $now = DateTime->now;
 my $tomorrow = $now->clone->add( days => 1 );
@@ -34,13 +36,15 @@ is $yesterday->dmy, '31-12-2011', 'yesterday date ok';
 ok my $person_ctrl = Lecstor::Model::Controller::Person->new(
     schema => Schema,
     validator => $valid,
-    current_user => Lecstor::Model::Instance::User->new,
+    current_user => $user,
+    current_session_id => $current_session_id,
 ), 'get person_set ok';
 
 ok my $action_ctrl = Lecstor::Model::Controller::Action->new(
     schema => Schema,
     validator => $valid,
-    current_user => Lecstor::Model::Instance::User->new,
+    current_user => $user,
+    current_session_id => $current_session_id,
 ), 'get person_set ok';
 
 ok my $user_set = Lecstor::Model::Controller::User->new(
@@ -49,10 +53,24 @@ ok my $user_set = Lecstor::Model::Controller::User->new(
     action_ctrl => $action_ctrl,
     validator => $valid,
     request => Lecstor::Request->new( session_id => 'testing123' ),
-    current_user => Lecstor::Model::Instance::User->new,
+    current_user => $user,
+    current_session_id => $current_session_id,
 ), 'get user_set ok';
 
 my ($user, $user2, $user3, $user4);
+
+note('Create invalid test users'); {
+
+    $user = $user_set->register({
+        username => 'lecstor',
+        email => 'bad_email',
+        password => 'abcd1234',
+    });
+
+    isa_ok $user, 'Lecstor::Error';
+    is $user->error, 'A valid email address is required', 'invalid email';
+
+};
 
 note('Create test users'); {
 
