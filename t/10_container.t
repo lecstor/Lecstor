@@ -109,7 +109,7 @@ TODO: {
 # to log in a user we set the _record attribute in that object.
 
 ok !$app->model->action->current_user, 'no current user';
-ok $app->model->user->login($user), 'login user ok';
+ok $app->request->login($user), 'login user ok';
 ok $app->model->action->current_user, 'current user ok';
 is $app->model->action->current_user->username, 'lecstor2', 'current user username ok';
 is $app->request->user->username, 'lecstor2', 'request->user->username ok';

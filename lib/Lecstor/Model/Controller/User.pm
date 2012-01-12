@@ -27,7 +27,7 @@ has person_ctrl => ( isa => 'Lecstor::Model::Controller', is => 'ro', required =
 
 L<Lecstor::Request>
 
-=cut
+#=cut
 
 has request => ( isa => 'Lecstor::Request', is => 'ro', required => 1 );
 
@@ -67,17 +67,6 @@ around 'create' => sub{
     load_class($model_class);
     return $model_class->new( _record => $self->$orig($params) );
 };
-
-=method login
-
-=cut
-
-sub login{
-    my ($self,$user) = @_;
-    $self->request->user->set_record($user);
-    $self->request->update_view;
-    $self->log_action('login');
-}
 
 =method register
 

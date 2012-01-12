@@ -105,7 +105,7 @@ sub BUILD {
             dependencies => {
                 schema => depends_on('schema'),
                 validator => depends_on('validator'),
-                request => depends_on('../Request/request'),
+#                request => depends_on('../Request/request'),
                 person_ctrl => depends_on('person'),
                 action_ctrl => depends_on('action'),
                 current_user => depends_on('../Request/user'),

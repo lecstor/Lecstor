@@ -48,7 +48,6 @@ ok my $user_set = Lecstor::Model::Controller::User->new(
     person_ctrl => $person_ctrl,
     action_ctrl => $action_ctrl,
     validator => $valid,
-    request => Lecstor::Request->new( session_id => 'testing123' ),
     current_user => $empty_user,
     current_session_id => $current_session_id,
 ), 'get user_set ok';

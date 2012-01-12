@@ -72,12 +72,13 @@ sub BUILD {
 
         service request => (
             class        => 'Lecstor::Request',
-            dependencies => [
-                depends_on('uri'),
-                depends_on('session_id'),
-                depends_on('view'),
-                depends_on('user'),
-            ],
+            dependencies => {
+                uri => depends_on('uri'),
+                session_id => depends_on('session_id'),
+                view => depends_on('view'),
+                user => depends_on('user'),
+                action_ctrl => depends_on('../Model/action'),
+            },
         );
     };
 }

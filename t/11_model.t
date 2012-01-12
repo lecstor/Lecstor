@@ -55,7 +55,6 @@ $ctrls{user} = Lecstor::Model::Controller::User->new(
     validator => $valid,
     action_ctrl => $ctrls{action},
     person_ctrl => $ctrls{person},
-    request => Lecstor::Request->new( session_id => 'testing123' ),
     current_user => Lecstor::Model::Instance::User->new,
     current_session_id => $session_id,
 );

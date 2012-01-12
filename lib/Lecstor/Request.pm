@@ -2,6 +2,8 @@ package Lecstor::Request;
 use Moose;
 use Class::Load 'load_class';
 
+with 'Lecstor::Role::ActionLogger';
+
 =head1 SYNOPSIS
 
     my $request = Lecstor::Request->new(
@@ -60,6 +62,19 @@ has view => (
     default => sub{{}},
 );
 
+=method login
+
+set the current user
+
+=cut
+
+sub login{
+    my ($self, $user) = @_;
+    $self->user->set_record($user);
+    $self->update_view;
+    return $self->user;
+}
+
 =method update_view
 
 =cut
@@ -78,6 +93,10 @@ sub update_view{
         $self->view({ visitor => $visitor });
     }
 }
+
+sub current_user{ shift->user }
+sub current_session_id{ shift->session_id }
+
 
 __PACKAGE__->meta->make_immutable;
 
