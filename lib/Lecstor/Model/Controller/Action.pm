@@ -5,6 +5,7 @@ use Class::Load ('load_class');
 # ABSTRACT: interface to action records
 
 extends 'Lecstor::Model::Controller';
+with 'Lecstor::Role::RequestData';
 
 sub resultset_name{ 'Action' }
 

@@ -24,7 +24,7 @@ use_ok('Lecstor::Valid');
 use_ok('Lecstor::Request');
 
 my $valid = Lecstor::Valid->new;
-my $user = Lecstor::Model::Instance::User->new;
+my $empty_user = Lecstor::Model::Instance::User->new;
 my $current_session_id = 'test01',
 
 my $now = DateTime->now;
@@ -35,15 +35,11 @@ is $yesterday->dmy, '31-12-2011', 'yesterday date ok';
 
 ok my $person_ctrl = Lecstor::Model::Controller::Person->new(
     schema => Schema,
-    validator => $valid,
-    current_user => $user,
-    current_session_id => $current_session_id,
 ), 'get person_set ok';
 
 ok my $action_ctrl = Lecstor::Model::Controller::Action->new(
     schema => Schema,
-    validator => $valid,
-    current_user => $user,
+    current_user => $empty_user,
     current_session_id => $current_session_id,
 ), 'get person_set ok';
 
@@ -53,7 +49,7 @@ ok my $user_set = Lecstor::Model::Controller::User->new(
     action_ctrl => $action_ctrl,
     validator => $valid,
     request => Lecstor::Request->new( session_id => 'testing123' ),
-    current_user => $user,
+    current_user => $empty_user,
     current_session_id => $current_session_id,
 ), 'get user_set ok';
 

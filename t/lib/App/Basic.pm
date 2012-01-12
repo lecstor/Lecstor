@@ -14,20 +14,30 @@ has schema => ( isa => 'DBIx::Class::Schema', is => 'ro' );
 
 my $valid = Lecstor::Valid->new;
 
-foreach my $set (qw! action person collection product !){
+my $session_id = time;
+
+foreach my $set (qw! person collection product !){
     my $class = 'Lecstor::Model::Controller::'. ucfirst($set);
     has $set => (
         isa => 'Object', is => 'ro', lazy => 1,
         default => sub {
             my ($self) = @_;
-            return $class->new(
-                schema => $self->schema,
-                validator => $valid,
-                current_user => Lecstor::Model::Instance::User->new,
-            );
+            return $class->new( schema => $self->schema );
         }
     );
 }
+
+has action => (
+    isa => 'Object', is => 'ro', lazy => 1,
+    default => sub {
+        my ($self) = @_;
+        return Lecstor::Model::Controller::Action->new(
+            schema => $self->schema,
+            current_user => Lecstor::Model::Instance::User->new,
+            current_session_id => $session_id,
+        );
+    }
+);
 
 has user => (
     isa => 'Object', is => 'ro', lazy => 1,
@@ -40,6 +50,7 @@ has user => (
             person_ctrl => $self->person,
             request => Lecstor::Request->new( session_id => 'testing123' ),
             current_user => Lecstor::Model::Instance::User->new,
+            current_session_id => $session_id,
         );
     }
 );

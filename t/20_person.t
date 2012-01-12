@@ -21,8 +21,6 @@ my $valid = Lecstor::Valid->new;
 
 ok my $person_set = Lecstor::Model::Controller::Person->new(
     schema => Schema,
-    validator => $valid,
-    current_user => Lecstor::Model::Instance::User->new,
 ), 'get person_set ok';
 
 ok my $person = $person_set->create({

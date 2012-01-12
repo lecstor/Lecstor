@@ -84,7 +84,7 @@ sub BUILD {
             lifecycle    => 'Singleton',
         );
 
-        foreach my $ctrl (qw! Action Person Collection Product Session !){
+        foreach my $ctrl (qw! Person Collection Product Session !){
             my $class = "Lecstor::Model::Controller::$ctrl";
             my $method = lc($ctrl);
             service $method => (
@@ -92,9 +92,9 @@ sub BUILD {
                 lifecycle    => 'Singleton',
                 dependencies => {
                     schema => depends_on('schema'),
-                    validator => depends_on('validator'),
-                    current_user => depends_on('../Request/user'),
-                    current_session_id => depends_on('../Request/session_id'),
+#                    validator => depends_on('validator'),
+#                    current_user => depends_on('../Request/user'),
+#                    current_session_id => depends_on('../Request/session_id'),
                 }
             );
         }
@@ -108,6 +108,16 @@ sub BUILD {
                 request => depends_on('../Request/request'),
                 person_ctrl => depends_on('person'),
                 action_ctrl => depends_on('action'),
+                current_user => depends_on('../Request/user'),
+                current_session_id => depends_on('../Request/session_id'),
+            }
+        );
+ 
+        service action => (
+            class => 'Lecstor::Model::Controller::Action',
+            lifecycle    => 'Singleton',
+            dependencies => {
+                schema => depends_on('schema'),
                 current_user => depends_on('../Request/user'),
                 current_session_id => depends_on('../Request/session_id'),
             }

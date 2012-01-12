@@ -32,28 +32,6 @@ has rs     => (
 
 sub _build_rs{ $_[0]->schema->resultset($_[0]->resultset_name) }
 
-=attr validator
-
-=cut
-
-has validator => ( is => 'ro', isa => 'Object', required => 1 );
-
-=attr current_user_id
-
-=cut
-
-has current_user => (
-    is => 'ro',
-    isa => 'Lecstor::Model::Instance::User',
-    required => 1
-);
-
-=attr current_session_id
-
-=cut
-
-has current_session_id => ( is => 'ro', isa => 'Str' );
-
 =method create
 
 =cut
@@ -88,7 +66,7 @@ returns an arrayref of collection item ids.
 
 sub search_for_id{
   my ($self, @args) = @_;
-  return $self->rs->search(@_)->get_column('id');
+  return $self->rs->search(@args)->get_column('id');
 }
 
 =method find

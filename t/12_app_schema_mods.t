@@ -39,21 +39,23 @@ use_ok('App::Model::Controller::Person');
 use_ok('Test::AppBasic');
 
 my $valid = Lecstor::Valid->new;
+my $session_id = time;
 
 my %ctrls;
-foreach my $ctrl (qw! Action Collection Product Session !){
-    my $class = 'Lecstor::Model::Controller::'. ucfirst($ctrl);
-    $ctrls{lc($ctrl)} = $class->new(
-        schema => Schema,
-        validator => $valid,
-    current_user => Lecstor::Model::Instance::User->new,
-    );
-}
 
 $ctrls{person} = App::Model::Controller::Person->new(
     schema => Schema,
-    validator => $valid,
+);
+
+foreach my $ctrl (qw! Collection Product Session !){
+    my $class = 'Lecstor::Model::Controller::'. ucfirst($ctrl);
+    $ctrls{lc($ctrl)} = $class->new( schema => Schema, );
+}
+
+$ctrls{action} = Lecstor::Model::Controller::Action->new(
+    schema => Schema,
     current_user => Lecstor::Model::Instance::User->new,
+    current_session_id => $session_id,
 );
 
 $ctrls{user} = Lecstor::Model::Controller::User->new(
@@ -63,6 +65,7 @@ $ctrls{user} = Lecstor::Model::Controller::User->new(
     person_ctrl => $ctrls{person},
     request => Lecstor::Request->new( session_id => 'testing123' ),
     current_user => Lecstor::Model::Instance::User->new,
+    current_session_id => $session_id,
 );
 
 my $lucy_index = tempdir( CLEANUP => 1);

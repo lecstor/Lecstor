@@ -1,13 +1,15 @@
 package Lecstor::Model::Controller::User;
 use Moose;
 use Class::Load ('load_class');
+use Lecstor::Error;
 
 # ABSTRACT: interface to user records
 
 extends 'Lecstor::Model::Controller';
+
+with 'Lecstor::Role::RequestData';
 with 'Lecstor::Role::ActionLogger';
 
-use Lecstor::Error;
 
 sub resultset_name{ 'User' }
 
@@ -28,6 +30,12 @@ L<Lecstor::Request>
 =cut
 
 has request => ( isa => 'Lecstor::Request', is => 'ro', required => 1 );
+
+=attr validator
+
+=cut
+
+has validator => ( is => 'ro', isa => 'Object', required => 1 );
 
 =head1 SYNOPSIS
 
