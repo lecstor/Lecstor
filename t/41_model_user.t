@@ -59,4 +59,42 @@ is $user->id, $user_id, 'id ok';
 ok $user = $user_ctrl->find_or_create({ username => 'lecstor2' }), 'find_or_create (create) ok';
 is $user->id, $user_id+1, 'id ok';
 
+ok $user = $user_ctrl->create({
+    username => 'lecstor3',
+    email => 'test1@eightdegrees.com.au',
+    password => 'abcd1234',
+}), 'create user ok';
+ok $user->check_password('abcd1234'), 'check_password ok';
+
+ok $user->set_temporary_password({
+    password => '4321abcd',
+    expires => DateTime->now->add( days => 1 ),
+}) => 'set_temporary_password ok';
+ok $user->check_password('4321abcd'), 'check_password (tmp pass) ok';
+
+ok $user->set_temporary_password({
+    password => 'dcba4321',
+    expires => DateTime->now->subtract( days => 1 ),
+}) => 'set_temporary_password (expired) ok';
+ok !$user->check_password('dcba4321'), 'check_password (expired tmp pass) ok';
+
+
 done_testing();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
