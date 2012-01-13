@@ -13,7 +13,7 @@ has '_record' => (
     handles => [qw!
         id created modified active
         username email person password
-        update temporary_password
+        update 
         roles
     !]
 );
@@ -38,16 +38,16 @@ returns true if the supplied password is correct
 =cut
 
 sub check_password{
-  my ($self, $password) = @_;
-  return 1 if $self->_record->check_password($password);
-  if (my $tmppass = $self->temporary_password){
-    if ($tmppass->expires < DateTime->now){
-      $tmppass->delete;
-      return;
+    my ($self, $password) = @_;
+    return 1 if $self->_record->check_password($password);
+    if (my $tmppass = $self->_record->temporary_password){
+        if ($tmppass->expires < DateTime->now){
+            $tmppass->delete;
+            return;
+        }
+        return $tmppass->check_password($password);
     }
-    return $tmppass->check_password($password);
-  }
-  return;
+    return;
 }
 
 =method set_temporary_password
@@ -84,6 +84,12 @@ The role to be added must already exist.
 
 sub add_to_roles{
     my ($self, @roles) = @_;
+    foreach(@roles){
+        next unless ref $_;
+        next if ref $_ eq 'HASH';
+        next if blessed $_ && $_->isa('DBIx::Class::Row');
+        Lecstor::X->throw('Roles must be either a string, hashref, or DBIx::Class::Row');
+    }
     my @objects;
     my $role_rs = $self->_record->result_source->schema->resultset('UserRole');
     my $role_map_rs = $self->_record->result_source->schema->resultset('UserRoleMap');
