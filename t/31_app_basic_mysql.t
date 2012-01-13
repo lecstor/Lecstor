@@ -1,9 +1,6 @@
 use strict;
 use warnings;
 use Test::More;
-use Data::Dumper;
-use DateTime;
-use Bread::Board;
 
 BEGIN {
     eval "use Test::mysqld"; if($@) {

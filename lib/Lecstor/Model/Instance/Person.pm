@@ -1,5 +1,6 @@
 package Lecstor::Model::Instance::Person;
 use Moose;
+use Lecstor::X;
 
 extends 'Lecstor::Model::Instance';
 
@@ -7,15 +8,15 @@ has '+_record' => (
     handles => [qw!
         id created modified
         update
-        firstname surname default_delivery
+        firstname surname email homephone workphone mobile
         billing_address
-        delivery_addresses
+        delivery_addresses default_delivery
     !]
 );
 
 sub name{
     my $self = shift;
-    die "$self->name is readonly" if @_;
+    Lecstor::X->throw('$self->name is readonly') if @_;
     return join(' ', $self->firstname, $self->surname);
 }
 
@@ -36,9 +37,10 @@ sub add_to_delivery_addresses{
 
 sub set_billing_address{
     my ($self, $address) = @_;
-    if ($address->{country} && $address->{country} =~ /[a-z]/i){
-        $address->{country} = { name => $address->{country} };
-    }
+    Lecstor::X->throw('Billing address requires a country')
+        unless $address->{country};
+    $address->{country} = { name => $address->{country} }
+        if $address->{country} =~ /[a-z]/i;
     return $self->related_resultset('billing_address')->create($address);
 }
 

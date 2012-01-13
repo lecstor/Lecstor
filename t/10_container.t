@@ -61,48 +61,14 @@ ok $app_container = $app_container_factory->create(
 
 ok my $app = $app_container->fetch('app')->get, 'app ok';
 
-ok my $person = $app->model->person->create({
-    firstname => 'Jason',
-    surname => 'Galea',
-    email => 'test1@eightdegrees.com.au',
-    homephone => '0123456789',
-}) => 'create person ok';
+isa_ok $app->model->person, 'Lecstor::Model::Controller::Person';
+isa_ok $app->model->user, 'Lecstor::Model::Controller::User';
 
 ok my $user = $app->model->user->create({
     username => 'lecstor',
     email => 'test1@eightdegrees.com.au',
     password => 'abcd1234',
 }) => 'create user ok';
-
-ok $user->person($person->id), 'set user person ok';
-$user->update;
-
-$user = $app->model->user->register({
-    username => 'lecstor',
-    email => 'test1@eightdegrees.com.au',
-    password => 'abcd1234',
-});
-ok !$user, 'register failed ok';
-is $user->error, 'That email address is already registered', 'error ok';
-
-ok $user = $app->model->user->register({
-    username => 'lecstor2',
-    email => 'test2@eightdegrees.com.au',
-    password => 'abcd1234',
-}), 'register ok';
-
-TODO: {
-    local $TODO = 'cos I really gotta go to bed..';
-    eval{
-        $user = $app->model->user->register({
-            username => 'lecstor',
-            email => 'jason@lecstor.com',
-            password => 'abcd1234',
-        });
-    };
-    diag($@);
-    ok $user, 'register ok';
-}
 
 # all objects that need it have a reference to the current user object
 # that may actually be an empty object if there is no logged in user.
@@ -111,7 +77,7 @@ TODO: {
 ok !$app->model->action->current_user, 'no current user';
 ok $app->request->login($user), 'login user ok';
 ok $app->model->action->current_user, 'current user ok';
-is $app->model->action->current_user->username, 'lecstor2', 'current user username ok';
-is $app->request->user->username, 'lecstor2', 'request->user->username ok';
+is $app->model->action->current_user->username, 'lecstor', 'current user username ok';
+is $app->request->user->username, 'lecstor', 'request->user->username ok';
 
 done_testing();

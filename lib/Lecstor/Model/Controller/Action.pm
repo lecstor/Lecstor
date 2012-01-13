@@ -23,7 +23,7 @@ sub _build_model_class{ 'Lecstor::Model::Instance::Action' }
         type => $type_str,
         session => $session_id,
         data => $data_hash,
-        person => $user_id,
+        user => $user_id,
     );
 
 =cut

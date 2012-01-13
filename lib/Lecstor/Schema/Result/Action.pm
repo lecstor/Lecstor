@@ -23,4 +23,8 @@ __PACKAGE__->set_primary_key('id');
 __PACKAGE__->belongs_to( 'user' => 'Lecstor::Schema::Result::User', undef, { join_type => 'LEFT OUTER' } );
 __PACKAGE__->belongs_to( 'type' => 'Lecstor::Schema::Result::ActionType' );
 
+sub inflate_result {
+    Lecstor::Model::Instance::Action->new( _record => shift->next::method(@_) );
+}
+ 
 1;

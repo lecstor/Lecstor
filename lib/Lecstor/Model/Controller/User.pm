@@ -85,11 +85,16 @@ sub register{
             # email already registered
             my $error = 'That email address is already registered';
             $self->log_action('register fail', { email => $params->{email}, error => $error });
-            $result = Lecstor::Error->new({ error => $error });
-        } else {
-            # params ok
-            $result = $self->create($v->get_params_hash);
+            return Lecstor::Error->new({ error => $error });
         }
+        if ($params->{username} && $self->find({ username => $params->{username} })){
+            # username already registered
+            my $error = 'That username is already registered';
+            $self->log_action('register fail', { username => $params->{username}, error => $error });
+            return Lecstor::Error->new({ error => $error });
+        }
+        # params ok
+        $result = $self->create($v->get_params_hash);
     } else {
         # invalid input
         $self->log_action('register fail', { username => $params->{email}, errors => $v->error_fields });
