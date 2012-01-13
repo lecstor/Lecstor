@@ -41,13 +41,16 @@ ok my $user_ctrl = Lecstor::Model::Controller::User->new({
 
 my ($user, $user2, $user3, $user4);
 
-ok !Lecstor::Model::Instance::User->new, 'empty user returns false ok';
-
 ok $user = $user_ctrl->create({
     username => 'lecstor',
     email => 'jason@lecstor.com',
 }), 'create user ok';
 my $user_id = $user->id;
+
+my $empty_user = Lecstor::Model::Instance::User->new;
+ok !$empty_user, 'empty user returns false ok';
+
+ok $empty_user->set_record($user), 'set record in empty user';
 
 ok $user = $user_ctrl->find($user_id), 'find ok';
 is $user->id, $user_id, 'id ok';
@@ -101,11 +104,11 @@ note('Test roles'); {
 
     eval{ $user->add_to_roles('NoRole') };
     ok $@, 'non-existent role not added ok';
-    is $@->message, 'NoRole does not exist', 'exception message ok';
+    is $@->message, "Role: 'NoRole' does not exist", 'exception message ok';
 
-    ok my $role = ResultSet('UserRole')->find({ name => 'Role1' }) => 'Role1 exists ok';
+    ok ResultSet('UserRole')->find({ name => 'Role1' }) => 'Role1 exists ok';
 
-    ok @roles = $user->add_to_roles({ name => 'Role1' }), 'add role by name ok';
+    ok @roles = $user->add_to_roles('Role1'), 'add role by name ok';
     isa_ok $roles[0], 'Lecstor::Schema::Result::UserRole';
     is $roles[0]->name, 'Role1', 'role name ok';
 
@@ -113,21 +116,22 @@ note('Test roles'); {
     is_deeply [qw! Role1 Role3 !], [sort map{ $_->name } $user2->roles], 'role names ok';
     is_deeply [qw! Role1 Role3 !], [$user2->roles_by_name], 'roles by name ok';
 
-    @roles = ResultSet('UserRole')->all;
-
-    ok $user3->add_to_roles($roles[0]), 'add role by object ok';
-    is_deeply [qw! Role1 !], [$user3->roles_by_name], 'roles by name ok';
-
-    ok $user4->add_to_roles(@roles), 'add roles by object ok';
-    is_deeply [qw! Role1 Role2 Role3 !], [$user4->roles_by_name], 'roles by name ok';
-
     try{
         ok @roles = $user->add_to_roles((bless {}, 'NotARow')), 'add bad object as role ok';
     } catch {
         my $error = $_;
         ok $error->does('Throwable::X') => 'got exception ok';
-        is $error->message, 'Roles must be either a string, hashref, or DBIx::Class::Row', 'exception message ok';
-    }
+        is $error->message, 'Roles must be added by name only. Roles not added.', 'exception message ok';
+    };
+
+    try{
+        ok @roles = $user->add_to_roles({}), 'add hashref as role ok';
+    } catch {
+        my $error = $_;
+        ok $error->does('Throwable::X') => 'got exception ok';
+        is $error->message, 'Roles must be added by name only. Roles not added.', 'exception message ok';
+    };
+
 }
 
 done_testing();

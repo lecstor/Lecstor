@@ -70,13 +70,6 @@ sub set_temporary_password{
 
     @roles = $user->add_to_roles('Role1');
     @roles = $user->add_to_roles(qw! Role1 Role3 !)
-    @roles = $user->add_to_roles({ name => 'Role1' });
-    @roles = $user->add_to_roles([
-        { name => 'Role1' },
-        { name => 'Role3' },
-    ]);
-    @roles = $user->add_to_roles($dbic_role_result);
-    @roles = $user->add_to_roles($dbic_role_result, $dbic_role_result2);
 
 The role to be added must already exist.
 
@@ -85,28 +78,21 @@ The role to be added must already exist.
 sub add_to_roles{
     my ($self, @roles) = @_;
     foreach(@roles){
-        next unless ref $_;
-        next if ref $_ eq 'HASH';
-        next if blessed $_ && $_->isa('DBIx::Class::Row');
-        Lecstor::X->throw('Roles must be either a string, hashref, or DBIx::Class::Row');
+        Lecstor::X->throw('Roles must be added by name only. Roles not added.')
+            if ref $_;
     }
     my @objects;
     my $role_rs = $self->_record->result_source->schema->resultset('UserRole');
     my $role_map_rs = $self->_record->result_source->schema->resultset('UserRoleMap');
     foreach my $role (@roles){
-        unless( blessed $role && $role->isa('DBIx::Class::Row') ){
-            $role = { name => $role } unless ref $role;
-            my $record = $role_rs->search($role)->single;
-            Lecstor::X->throw( $role->{name} . " does not exist" )
-                unless $record;
-            $role = $record;
-        }
+        my $record = $role_rs->search({ name => $role })->single;
+        Lecstor::X->throw( "Role: '$role' does not exist" ) unless $record;
         $role_map_rs->create({
             created => DateTime->now( time_zone => 'local' ),
             user => $self->_record->id,
-            role => $role->id,
+            role => $record->id,
         });
-        push(@objects, $role);
+        push(@objects, $record);
     }
     return @objects;
 }
