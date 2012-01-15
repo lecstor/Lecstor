@@ -25,6 +25,7 @@ __PACKAGE__->config(
 sub build_per_context_instance {
     my ($self, $ctx) = @_;
     my $root = $ctx->path_to('root');
+    $ctx->log->debug("Path to root: $root") if $ctx->debug;
     if (my @inc = @{$self->config->{include_paths}}){
         @{ $self->include_path } = map { "$root/$_" } @inc;
     }

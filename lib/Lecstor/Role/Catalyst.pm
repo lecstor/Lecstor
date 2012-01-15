@@ -70,7 +70,7 @@ $ENV{CATALYST_CONFIG_LOCAL_SUFFIX} ||= $ENV{LECSTOR_DEPLOY};
 
 sub lecstor{ shift->model('Lecstor', @_) }
 
-sub controllers{qw( Account )}
+sub controllers{qw( Root Account )}
 
 sub views{qw( TT )}
 

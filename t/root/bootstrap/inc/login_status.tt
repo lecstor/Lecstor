@@ -1,0 +1,20 @@
+<div class="well">
+  [% visitor = view.visitor %]
+  [% IF visitor.logged_in %]
+    <p>Logged in as 
+      <a href="/account">[% IF visitor.name %][% visitor.name %] ([% visitor.email %])[% ELSE %][% visitor.email %][% END %]</a>
+    </p>
+  [% ELSE %]
+    <form class="login_or_register" action="/login_or_register" method="post">
+      <input class="span3" type="text" placeholder="Email" name="email">
+      <input class="span3" type="password" placeholder="Password" name="password">
+      <input type="submit" name="action" class="btn primary" type="submit" value="Sign In" />
+      <input type="submit" name="action" class="btn success pull-right" type="submit" value="Register" />
+    </form>
+  [% END %]
+
+  <a class="btn large primary" href="#">My Basket</a>
+  <a class="btn large primary [% IF visitor.logged_in; '"'; ELSE; ' disabled" title="Please login to access your wishlist"'; END %] href="#">My Wishlist</a>
+  <div style="clear: both"></div>
+  <a class="btn large success" href="#">Checkout >>></a>
+</div>
