@@ -67,7 +67,7 @@ __PACKAGE__->config(
         include_paths => [qw! bootstrap base !],
     },
 
-    'Plugin::ConfigLoader' => { file => 't/lecstor_catalyst_app_test.yml' },
+    'Plugin::ConfigLoader' => { file => 't/catapp.yml' },
 
 );
 
