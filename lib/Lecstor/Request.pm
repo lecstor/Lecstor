@@ -88,6 +88,7 @@ sub update_view{
           logged_in => 1,
           email => $user->email,
           name => $user->username,
+          username => $user->username,
         };
         $visitor->{name} ||= $user->person->name if $user->person;
         $self->view({ visitor => $visitor });
