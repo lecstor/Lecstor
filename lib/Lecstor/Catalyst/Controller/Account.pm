@@ -38,6 +38,7 @@ sub register :Chained('setup') :PathPart('register') :Args(0){
             $c->stash->{error} = $result;
         } else {
             $c->stash->{user} = $result;
+            $c->authenticate({ email => $params->{email}, password => $params->{password} });
             $app->request->login($result);
         }
     }
