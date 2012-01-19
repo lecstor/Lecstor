@@ -41,13 +41,13 @@ with 'Lecstor::Role::ActionLogger';
 
 =cut
 
-has model => ( is => 'ro', isa => 'Lecstor::Model', required => 1 );
+has model => ( is => 'ro', isa => 'Object', required => 1 );
 
 =attr request
 
 =cut
 
-has request => ( is => 'ro', isa => 'Lecstor::Request', required => 1 );
+has request => ( is => 'ro', isa => 'Object', required => 1 );
 
 =attr validator
 
