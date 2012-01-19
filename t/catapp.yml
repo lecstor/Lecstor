@@ -1,5 +1,6 @@
 home: t/
 root: t/root
+default_user_uri: /
 lecstor:
   product_search:
     index_path: 'path/to/index/directory'
