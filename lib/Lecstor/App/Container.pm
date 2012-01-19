@@ -53,11 +53,6 @@ sub _build_builder {
   
         service template_processor => $self->template_processor;
  
-        service validator => (
-            class        => 'Lecstor::Valid',
-            lifecycle    => 'Singleton',
-        );
- 
         service error_class => 'Lecstor::Error';
  
         service app => (
@@ -67,7 +62,7 @@ sub _build_builder {
                 model => depends_on('Model/model'),
                 request => depends_on('Request/request'),
                 template_processor => depends_on('template_processor'),
-                validator => depends_on('validator'),
+                validator => depends_on('Model/validator'),
                 error_class => depends_on('error_class'),
                 action_ctrl => depends_on('Model/action'),
             }
