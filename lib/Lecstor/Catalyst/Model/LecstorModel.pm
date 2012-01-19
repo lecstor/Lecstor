@@ -10,7 +10,7 @@ __PACKAGE__->config(
 
 sub COMPONENT {
     my ($cclass, $app, $args) = @_;
-    my $class = $cclass->config->{class};
+    my $class = $args->{class} || $cclass->config->{class};
     load_class($class);
     return $class->new(
         config => {

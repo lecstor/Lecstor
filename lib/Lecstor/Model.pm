@@ -1,6 +1,5 @@
 package Lecstor::Model;
 use Moose;
-use Class::Load 'load_class';
 
 =head1 SYNOPSIS
 
