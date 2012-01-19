@@ -57,10 +57,19 @@ has validator => ( is => 'ro', isa => 'Object', required => 1 );
 around 'create' => sub{
     my ($orig, $self, $params) = @_;
     my $valid = $self->validator->class('user', params => $params );
-    return Lecstor::Error->new({
-        error => $valid->errors_to_string,
-        error_fields => $valid->error_fields,
-    }) unless $valid->validate;
+    unless ($valid->validate){
+        $self->log_action(
+            'register fail' => {
+                params => $params,
+                error => $valid->error_fields,
+                validation => 'user',
+            }
+        );
+        return Lecstor::Error->new({
+            error => $valid->errors_to_string,
+            error_fields => $valid->error_fields,
+        });
+    }
     # set user active by default
     $params->{active} = 1 unless exists $params->{active};
     my $model_class = $self->model_class;
@@ -97,7 +106,13 @@ sub register{
         $result = $self->create($v->get_params_hash);
     } else {
         # invalid input
-        $self->log_action('register fail', { username => $params->{email}, errors => $v->error_fields });
+        $self->log_action(
+            'register fail', {
+                username => $params->{email},
+                errors => $v->error_fields,
+                validation => 'registration',
+            }
+        );
         $result = Lecstor::Error->new({
             error_fields => $v->error_fields,
             error => $v->errors_to_string,

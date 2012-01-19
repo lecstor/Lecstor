@@ -76,7 +76,7 @@ sub login :Chained('setup') :PathPart('login') :Args(0){
                 $c->res->redirect( $uri );
                 return;
             } else {
-                $app->log_action('login fail', { username => $params->{email} });
+                $app->log_action('login fail', { params => $params, validation => 'catalyst authenticate' });
                 $c->stash->{error} = $app->error({
                     error => 'The email address or password is incorrect.'
                 });
@@ -84,7 +84,7 @@ sub login :Chained('setup') :PathPart('login') :Args(0){
         } else {
             $app->log_action(
                 'login fail',
-                { username => $params->{email}, errors => $v->error_fields }
+                { username => $params->{email}, errors => $v->error_fields, validation => 'user' }
             );
             $c->stash->{error} = $app->error({
                 error_fields => $v->error_fields,

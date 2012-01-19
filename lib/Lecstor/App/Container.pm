@@ -23,6 +23,18 @@ final container using other containers..
         Request => $request_container,
     );
 
+=attr app_class
+
+=cut
+
+has app_class => (
+    is      => 'ro',
+    isa     => 'Str',
+    builder => '_build_app_class',
+);
+
+sub _build_app_class{ 'Lecstor::App' }
+
 =attr template_processor
 
 =cut
@@ -56,7 +68,7 @@ sub _build_builder {
         service error_class => 'Lecstor::Error';
  
         service app => (
-            class        => 'Lecstor::App',
+            class        => $self->app_class,
             lifecycle    => 'Singleton',
             dependencies => {
                 model => depends_on('Model/model'),
