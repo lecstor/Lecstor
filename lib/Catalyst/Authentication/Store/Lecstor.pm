@@ -23,6 +23,7 @@ sub BUILDARGS{
 sub find_user{
   my ($self, $authinfo, $c) = @_;
 
+  return unless $authinfo->{email} || $authinfo->{username} || $authinfo->{id};
   my $user = $c->lecstor->model->user->find($authinfo);
   return unless $user;
 
@@ -31,12 +32,12 @@ sub find_user{
 
 sub for_session{
   my ( $self, $c, $user ) = @_;
-  return($user->get('email'));
+  return($user->get('id'));
 }
 
 sub from_session{
   my ( $self, $c, $id ) = @_;
-  return $self->find_user({ email => $id }, $c);
+  return $self->find_user({ id => $id }, $c);
 }
 
 1;
