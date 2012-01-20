@@ -17,7 +17,12 @@ sub setup :Chained('/') :PathPart('') :CaptureArgs(0){}
 
 =cut
 
-sub restricted :Chained('setup') :PathPart('') :CaptureArgs(0){}
+sub restricted :Chained('setup') :PathPart('') :CaptureArgs(0){
+    my ( $self, $c ) = @_;
+    return 1 unless $c->user_exists;
+    $c->response->body('400');
+    return 0;
+}
 
 =method register
 
