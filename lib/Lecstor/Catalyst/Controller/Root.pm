@@ -61,7 +61,7 @@ sub index :Chained('full_page') :PathPart('') :Args(0){
     
     $c->stash({
         template => 'index.tt',
-        view => $app->request->view({
+        view => $app->response->view({
             page => {
                 title => 'Home',
             },

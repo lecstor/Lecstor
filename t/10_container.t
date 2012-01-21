@@ -75,9 +75,16 @@ ok my $user = $app->model->user->create({
 # to log in a user we set the _record attribute in that object.
 
 ok !$app->model->action->current_user, 'no current user';
-ok $app->request->login($user), 'login user ok';
+ok $app->login($user), 'login user ok';
+is $app->user->username, 'lecstor', 'request->user->username ok';
+
+# need a fresh request to update current_user in all app sub-components
+#ok $app_container = $app_container_factory->create(
+#    Model => $model_container,
+#    Request => $request_container,
+#), 'app container ok';
+#ok $app = $app_container->fetch('app')->get, 'app ok';
 ok $app->model->action->current_user, 'current user ok';
 is $app->model->action->current_user->username, 'lecstor', 'current user username ok';
-is $app->request->user->username, 'lecstor', 'request->user->username ok';
 
 done_testing();

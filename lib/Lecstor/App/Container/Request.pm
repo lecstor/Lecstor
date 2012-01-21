@@ -1,7 +1,8 @@
 package Lecstor::App::Container::Request;
 use Moose;
 use Bread::Board;
-use Lecstor::Model::Instance::User;
+use Digest;
+use Digest::SHA;
 
 extends 'Bread::Board::Container';
 
@@ -11,55 +12,34 @@ has '+name' => ( default => 'Lecstor-Request' );
 
     my $container = Lecstor::App::Container::Request->new({
         session_id => $sess_id,
-        user => $user,
         uri => $uri,
     });
 
-    my $model = $container->build_app();
-
-=attr schema
+=attr uri
 
 =cut
 
 has uri => ( is => 'ro', isa => 'URI' );
 
-has session_id => ( is => 'rw', isa => 'Str', required => 1 );
-
-=attr user
-
-the currently logged in user
-
-L<Lecstor::Model::Instance::User>
+=attr session_id
 
 =cut
 
-has user => (
-    is => 'ro',
-    isa => 'Lecstor::Model::Instance::User',
-    lazy_build => 1
-);
+has session_id => ( is => 'rw', isa => 'Str', lazy_build => 1 );
 
-sub _build_user{ Lecstor::Model::Instance::User->new }
+sub _build_session_id {
+    my $self = shift;
+    my $digest = Digest->new('SHA-256');
+    $digest->add( $self->session_hash_seed() );
+    return $digest->hexdigest;
+}
 
-=attr view
-
-    $app->view({ animals => { dogs => 1 } });
-    # $app->view: { animals => { dogs => 1 } }
-    $app->view({ animals => { cats => 2 } });
-    # $app->view: { animals => { dogs => 1, cats => 2 } }
-    $app->set_view({ foo => bar });
-    # $app->view: { foo => bar });
-    $app->clear_view;
-    # $app->view: undef
-
-Hashref containing view attributes
-
-See L<MooseX::Traits::Attribute::MergeHashRef>
-
-=cut
-
-has view => ( is => 'rw', isa => 'HashRef', default => sub{{}} );
-
+my $counter;
+ 
+sub session_hash_seed {
+    my $self = shift;
+    return join( "", ++$counter, time, rand, $$, {}, overload::StrVal($self), );
+} 
 
 sub BUILD {
     my $self = shift;
@@ -67,17 +47,11 @@ sub BUILD {
     container $self => as {
         service uri => $self->uri;
         service session_id => $self->session_id;
-        service view => $self->view;
-        service user => $self->user;
-
         service request => (
             class        => 'Lecstor::Request',
             dependencies => {
                 uri => depends_on('uri'),
                 session_id => depends_on('session_id'),
-                view => depends_on('view'),
-                user => depends_on('user'),
-                action_ctrl => depends_on('../Model/action'),
             },
         );
     };

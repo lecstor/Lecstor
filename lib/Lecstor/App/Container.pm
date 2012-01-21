@@ -1,7 +1,8 @@
 package Lecstor::App::Container;
 use Moose;
 use Bread::Board;
- 
+use Lecstor::Model::Instance::User;
+
 extends 'Bread::Board::Container';
 
 has '+name' => ( default => 'Lecstor' );
@@ -61,16 +62,43 @@ has 'builder' => ( isa => 'Object', is => 'ro', lazy_build => 1 );
 sub _build_builder {
     my $self = shift;
 
+    my $empty_user = Lecstor::Model::Instance::User->new;
+
     my $c = container 'Lecstor' => [ 'Model', 'Request' ] => as {
   
         service template_processor => $self->template_processor;
  
         service error_class => 'Lecstor::Error';
+
+        service session => (
+            block => sub{
+                my ($service) = @_;
+                my $session_id = $service->param('request')->session_id;
+                return $service->param('session_ctrl')->instance($session_id);
+            },
+            dependencies => {
+                request => depends_on('Request/request'),
+                session_ctrl => depends_on('Model/session'),
+            },
+        );
+
+        service user => (
+            block => sub{
+                my ($service) = @_;
+                my $session = $service->param('session');
+                return $session->user || $empty_user;
+            },
+            dependencies => {
+                session => depends_on('session'),
+            },
+        );
  
         service app => (
             class        => $self->app_class,
             lifecycle    => 'Singleton',
             dependencies => {
+                user => depends_on('user'),
+                session => depends_on('session'),
                 model => depends_on('Model/model'),
                 request => depends_on('Request/request'),
                 template_processor => depends_on('template_processor'),

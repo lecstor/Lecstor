@@ -29,7 +29,7 @@ is $session->id, 'abc123', 'id ok';
 ok my $session_rs = $session_ctrl->search({ id => 'abc123' }), 'search ok';
 isa_ok $session_rs, 'DBIx::Class::ResultSet';
 ok $session = $session_rs->first, 'first ok';
-isa_ok $session, 'Lecstor::Schema::Result::Session';
+isa_ok $session, 'Lecstor::Model::Instance::Session';
 
 ok my $session_rsc = $session_ctrl->search_for_id({ id => 'abc123' }), 'search_for_id ok';
 isa_ok $session_rsc, 'DBIx::Class::ResultSetColumn';

@@ -2,7 +2,7 @@ package Lecstor::Request;
 use Moose;
 use Class::Load 'load_class';
 
-with 'Lecstor::Role::ActionLogger';
+#with 'Lecstor::Role::ActionLogger';
 
 =head1 SYNOPSIS
 
@@ -11,7 +11,7 @@ with 'Lecstor::Role::ActionLogger';
         session_id => $session_id,
     );
 
-=cut
+#=cut
 
 sub BUILD{
     shift->update_view;
@@ -28,45 +28,12 @@ has uri => ( is => 'ro', isa => 'URI' );
 
 has session_id => ( is => 'rw', isa => 'Str', required => 1 );
 
-=attr user
-
-=cut
-
-has user => (
-    is => 'rw', isa => 'Lecstor::Model::Instance::User', lazy_build => 1,
-#    trigger => \&update_view,    
-);
-
-sub _build_user{ Lecstor::Model::Instance::User->new }
-
-=attr view
-
-    $app->view({ animals => { dogs => 1 } });
-    # $app->view: { animals => { dogs => 1 } }
-    $app->view({ animals => { cats => 2 } });
-    # $app->view: { animals => { dogs => 1, cats => 2 } }
-    $app->set_view({ foo => bar });
-    # $app->view: { foo => bar });
-    $app->clear_view;
-    # $app->view: undef
-
-Hashref containing view attributes
-
-See L<MooseX::Traits::Attribute::MergeHashRef>
-
-=cut
-
-has view => (
-    is => 'rw', isa => 'HashRef',
-    traits => [qw(MergeHashRef)],
-    default => sub{{}},
-);
 
 =method login
 
 set the current user
 
-=cut
+#=cut
 
 sub login{
     my ($self, $user) = @_;
@@ -77,7 +44,7 @@ sub login{
 
 =method update_view
 
-=cut
+#=cut
 
 sub update_view{
     my ($self) = @_;
@@ -98,6 +65,8 @@ sub update_view{
 
 sub current_user{ shift->user }
 sub current_session_id{ shift->session_id }
+
+=cut
 
 
 __PACKAGE__->meta->make_immutable;

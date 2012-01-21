@@ -7,10 +7,15 @@ extends 'Lecstor::Model::Instance';
 has '+_record' => (
     handles => [qw!
         id created modified 
-        expires data
+        expires data user
         update delete
     !]
 );
+
+sub set_user{
+    my ($self, $user) = @_;
+    $self->update({ user => $user->_record });
+}
 
 __PACKAGE__->meta->make_immutable;
 
