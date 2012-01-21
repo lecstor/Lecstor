@@ -19,9 +19,15 @@ sub setup :Chained('/') :PathPart('') :CaptureArgs(0){}
 
 sub restricted :Chained('setup') :PathPart('') :CaptureArgs(0){
     my ( $self, $c ) = @_;
-    return 1 unless $c->user_exists;
-    $c->response->body('400');
-    return 0;
+
+    $c->log->debug(
+        'Controller::Account->restricted user email: '. $c->user->user_object->email
+    ) if $c->user_exists && $c->debug;
+
+    unless($c->user_exists){
+        $c->response->body('400');
+        $c->detach;
+    }
 }
 
 =method register
@@ -44,7 +50,7 @@ sub register :Chained('setup') :PathPart('register') :Args(0){
         } else {
             $c->stash->{user} = $result;
             $c->authenticate({ email => $params->{email}, password => $params->{password} });
-            $app->request->login($result);
+            $app->login($result);
         }
     }
 
@@ -53,7 +59,7 @@ sub register :Chained('setup') :PathPart('register') :Args(0){
     $c->stash({
         template => 'account/register.tt',
         params => $params,
-        view => $app->request->view({ page => { title => 'Register' }}),
+        view => $app->response->view({ page => { title => 'Register' }}),
     });
 }
 
@@ -74,7 +80,7 @@ sub login :Chained('setup') :PathPart('login') :Args(0){
         my $v = $app->validator->class('user', params => $params);
         if ( $v->validate ){
             if ( $c->authenticate($params) ){
-                $app->request->login($c->user->user_object);
+                $app->login($c->user->user_object);
                 $c->stash->{success} = 1;
                 my $recent = $c->session->{recent_uri}[0];
                 my $uri = $recent ? $recent->path_query : $c->uri_for($c->config->{default_user_uri});
@@ -102,7 +108,7 @@ sub login :Chained('setup') :PathPart('login') :Args(0){
 
     $c->stash({
         template => 'account/login.tt',
-        view => $app->request->view({ page => { title => 'Log In' }}),
+        view => $app->response->view({ page => { title => 'Log In' }}),
         params => $params,
     });
 

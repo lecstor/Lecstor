@@ -108,7 +108,7 @@ sub BUILD {
 #                request => depends_on('../Request/request'),
                 person_ctrl => depends_on('person'),
                 action_ctrl => depends_on('action'),
-                current_user => depends_on('../Request/user'),
+                current_user => depends_on('../user'),
                 current_session_id => depends_on('../Request/session_id'),
             }
         );
@@ -118,7 +118,7 @@ sub BUILD {
             lifecycle    => 'Singleton',
             dependencies => {
                 schema => depends_on('schema'),
-                current_user => depends_on('../Request/user'),
+                current_user => depends_on('../user'),
                 current_session_id => depends_on('../Request/session_id'),
             }
         );

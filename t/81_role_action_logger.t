@@ -57,7 +57,7 @@ ok my $logger = ActionLogger->new(
 ok my $action = $logger->log_action('test1') => 'log action with type';
 isa_ok $action, 'Lecstor::Model::Instance::Action';
 is $action->type->name, 'test1', 'type ok';
-is $action->data, undef, 'data ok';
+is_deeply $action->data, { caller => 'main - 57' }, 'data ok';
 
 ok $logger = ActionLogger->new(
     action_ctrl => Lecstor::Model::Controller::Action->new(
@@ -72,7 +72,7 @@ ok $logger = ActionLogger->new(
 ok $action = $logger->log_action('test1' => { with => 'data' }) => 'log action with type and data';
 isa_ok $action, 'Lecstor::Model::Instance::Action';
 is $action->type->name, 'test1', 'type ok';
-is_deeply $action->data, { with => 'data' }, 'data ok';
+is_deeply $action->data, { with => 'data', caller => 'main - 72' }, 'data ok';
 
 
 done_testing();

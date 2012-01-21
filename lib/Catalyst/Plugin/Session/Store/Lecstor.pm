@@ -6,6 +6,10 @@ use warnings;
  
 our $VERSION = "0.01";
  
+# Keys are in the format prefix:id, where prefix is session, expires,
+# or flash, and id is always the session ID. Plugins such as
+# Catalyst::Plugin::Session::PerUser store extensions to this format,
+# such as user:username.
 
 sub get_session_data {
     my ($c, $key) = @_;

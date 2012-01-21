@@ -3,19 +3,19 @@ use Moose;
 use MooseX::Params::Validate;
 use MooseX::StrictConstructor;
 use Class::Load 'load_class';
+use Lecstor::Response;
 
 =method current_user
 
 =cut
 
-sub current_user{ shift->request->user }
+sub current_user{ shift->user }
 
 =method current_session_id
 
 =cut
 
 sub current_session_id{ shift->request->session_id }
-
 
 with 'Lecstor::Role::ActionLogger';
 
@@ -37,6 +37,14 @@ with 'Lecstor::Role::ActionLogger';
 
 =cut
 
+sub BUILD{
+    shift->update_view;
+}
+
+has session => ( is => 'ro', isa => 'Object', required => 1 );
+
+has user => ( is => 'rw', isa => 'Object', required => 1 );
+
 =attr model
 
 =cut
@@ -48,6 +56,16 @@ has model => ( is => 'ro', isa => 'Object', required => 1 );
 =cut
 
 has request => ( is => 'ro', isa => 'Object', required => 1 );
+
+=attr response
+
+=cut
+
+has response => ( is => 'ro', isa => 'Object', lazy_build => 1 );
+
+sub _build_response{
+    Lecstor::Response->new({ view => { uri => $_[0]->request->uri }});
+}
 
 =attr validator
 
@@ -71,6 +89,30 @@ sub error{
     my ($self, $args) = @_;
     my $class = $self->error_class;
     return $class->new($args);
+}
+
+sub login{
+    my ($self, $user) = @_;
+    my $session = $self->session->set_user($user);
+    $self->user->_record($user->_record);
+    $self->update_view;
+}
+
+sub update_view{
+    my ($self) = @_;
+    my $user = $self->user;
+    if ($user){
+        my $visitor = {
+#          %{$self->view->{visitor} || {}},
+          logged_in => 1,
+          email => $user->email,
+          name => $user->username,
+          username => $user->username,
+          user_id => $user->id,
+        };
+        $visitor->{name} ||= $user->person->name if $user->person;
+        $self->response->view({ visitor => $visitor });
+    }
 }
 
 =method log_action
