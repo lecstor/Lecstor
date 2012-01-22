@@ -32,8 +32,6 @@ has rs     => (
 
 sub _build_rs{ $_[0]->schema->resultset($_[0]->resultset_name) }
 
-has relationships => ( is => 'ro', isa => 'HashRef', builder => '_build_relationships' );
-
 =method create
 
 =cut
@@ -132,12 +130,13 @@ related objects.
 
 sub separate_params{
     my ($self, $params) = @_;
-    my %relationships = %{ $self->relationships };
+
     my $rel_data;
-    foreach my $rel (keys %relationships){
-        foreach my $field ( @{$relationships{$rel} } ){
-            $rel_data->{$rel}{$field} = delete $params->{$field};
-        }
+    foreach my $param (keys %$params){
+        next unless $param =~ /\./;
+        my $value = delete $params->{$param};
+        my ($rel, $key) = split(/\./, $param, 2);
+        $rel_data->{$rel}{$key} = $value;
     }
     return ($params, $rel_data);
 }
