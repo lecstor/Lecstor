@@ -20,14 +20,15 @@ sub setup :Chained('/') :PathPart('') :CaptureArgs(0){}
 sub restricted :Chained('setup') :PathPart('') :CaptureArgs(0){
     my ( $self, $c ) = @_;
 
-    $c->log->debug(
-        'Controller::Account->restricted user email: '. $c->user->user_object->email
-    ) if $c->user_exists && $c->debug;
-
     unless($c->user_exists){
         $c->response->body('400');
         $c->detach;
     }
+
+    $c->log->debug(
+        'Controller::Account->restricted user id: '. $c->user->user_object->id
+    ) if $c->debug;
+
 }
 
 =method register

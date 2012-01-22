@@ -46,6 +46,10 @@ has template_processor => (
     required => 1,
 );
 
+has empty_user => ( is => 'ro', isa => 'Object', lazy_build => 1 );
+
+sub _build_empty_user{ Lecstor::Model::Instance::User->new }
+
 =attr builder
 
     $app_c->builder->create({
@@ -61,8 +65,6 @@ has 'builder' => ( isa => 'Object', is => 'ro', lazy_build => 1 );
 
 sub _build_builder {
     my $self = shift;
-
-    my $empty_user = Lecstor::Model::Instance::User->new;
 
     my $c = container 'Lecstor' => [ 'Model', 'Request' ] => as {
   
@@ -86,7 +88,7 @@ sub _build_builder {
             block => sub{
                 my ($service) = @_;
                 my $session = $service->param('session');
-                return $session->user || $empty_user;
+                return $session->user || $self->empty_user;
             },
             dependencies => {
                 session => depends_on('session'),
