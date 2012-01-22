@@ -1,7 +1,7 @@
 package Lecstor::Schema::Result::Session;
-
 use strict;
 use warnings;
+use Lecstor::Model::Instance::Session;
 
 use parent qw/DBIx::Class/;
 
