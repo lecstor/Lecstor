@@ -32,6 +32,8 @@ has rs     => (
 
 sub _build_rs{ $_[0]->schema->resultset($_[0]->resultset_name) }
 
+has relationships => ( is => 'ro', isa => 'HashRef', builder => '_build_relationships' );
+
 =method create
 
 =cut
@@ -53,6 +55,7 @@ returns an arrayref of item objects.
 
 sub search{
     my ($self, @args) = @_;
+    @args = $self->reconstruct_search_args(@args);
     return $self->prefetch_single_related_rs->search(@args);
 }
 
@@ -65,8 +68,10 @@ returns an arrayref of collection item ids.
 =cut
 
 sub search_for_id{
-  my ($self, @args) = @_;
-  return $self->rs->search(@args)->get_column('id');
+    my ($self, @args) = @_;
+    @args = $self->reconstruct_search_args(@args);
+    my $me = $self->rs->current_source_alias;
+    return $self->rs->search(@args)->get_column("$me.id");
 }
 
 =method find
@@ -106,6 +111,36 @@ override this method to prefetch simple relationships.
 =cut
 
 sub prefetch_single_related_rs{ $_[0]->rs }
+
+=method reconstruct_search_args
+
+reconstruct the provided search args to suit table relationships
+
+=cut
+
+sub reconstruct_search_args{
+    my $self = shift;
+    return @_;
+}
+
+=method separate_params
+
+takes a hashref of parameters and separates out those belonging to
+related objects.
+
+=cut
+
+sub separate_params{
+    my ($self, $params) = @_;
+    my %relationships = %{ $self->relationships };
+    my $rel_data;
+    foreach my $rel (keys %relationships){
+        foreach my $field ( @{$relationships{$rel} } ){
+            $rel_data->{$rel}{$field} = delete $params->{$field};
+        }
+    }
+    return ($params, $rel_data);
+}
 
 __PACKAGE__->meta->make_immutable;
 
