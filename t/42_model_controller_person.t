@@ -12,6 +12,7 @@ use Test::DBIx::Class {
 }, 'Person';
 
 use_ok('Lecstor::Model::Controller::Person');
+use_ok('Lecstor::Model::Instance::Person');
 
 ok my $person_ctrl = Lecstor::Model::Controller::Person->new(
     schema => Schema,

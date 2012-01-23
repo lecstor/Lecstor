@@ -1,6 +1,13 @@
 package Lecstor::Model;
 use Moose;
 
+use Lecstor::Model::Instance::Action;
+use Lecstor::Model::Instance::Person;
+use Lecstor::Model::Instance::User;
+use Lecstor::Model::Instance::Collection;
+use Lecstor::Model::Instance::Product;
+use Lecstor::Model::Instance::Session;
+
 =head1 SYNOPSIS
 
     my $model = Lecstor::Model->new(

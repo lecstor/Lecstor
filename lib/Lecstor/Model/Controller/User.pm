@@ -72,7 +72,6 @@ around 'create' => sub{
     # set user active by default
     $params->{active} = 1 unless exists $params->{active};
     my $model_class = $self->model_class;
-    load_class($model_class);
     return $model_class->new( _record => $self->$orig($params) );
 };
 
