@@ -1,5 +1,5 @@
 package Lecstor::Error;
-use Moose;
+use Any::Moose;
 
 # ABSTRACT: an error object which returns false in scalar context
 

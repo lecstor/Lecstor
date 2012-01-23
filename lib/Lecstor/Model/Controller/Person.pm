@@ -1,6 +1,5 @@
 package Lecstor::Model::Controller::Person;
-use Moose;
-use Class::Load ('load_class');
+use Any::Moose;
 
 # ABSTRACT: interface to person records
 
@@ -52,7 +51,6 @@ around 'create' => sub{
     # set person active by default
     $params->{active} = 1 unless exists $params->{active};
     my $model_class = $self->model_class;
-    load_class($model_class);
     return $model_class->new( _record => $self->$orig($params) );
 };
 

@@ -1,6 +1,5 @@
 package Lecstor::Model::Controller::Session;
-use Moose;
-use Class::Load ('load_class');
+use Any::Moose;
 
 # ABSTRACT: interface to session records
 
@@ -34,7 +33,6 @@ sub _build_model_class{ 'Lecstor::Model::Instance::Session' }
 around 'create' => sub{
     my ($orig, $self, $params) = @_;
     my $model_class = $self->model_class;
-    load_class($model_class);
     return $model_class->new( _record => $self->$orig($params) );
 };
 

@@ -1,6 +1,5 @@
 package Lecstor::Model::Controller::User;
-use Moose;
-use Class::Load ('load_class');
+use Any::Moose;
 use Lecstor::Error;
 
 # ABSTRACT: interface to user records

@@ -1,5 +1,5 @@
 package Lecstor::Model::Instance::Person;
-use Moose;
+use Any::Moose;
 use Lecstor::X;
 
 extends 'Lecstor::Model::Instance';

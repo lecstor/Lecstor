@@ -1,6 +1,5 @@
 package Lecstor::Model::Controller::Action;
-use Moose;
-use Class::Load ('load_class');
+use Any::Moose;
 
 # ABSTRACT: interface to action records
 
@@ -31,7 +30,6 @@ sub _build_model_class{ 'Lecstor::Model::Instance::Action' }
 around 'create' => sub{
     my ($orig, $self, $params) = @_;
     my $model_class = $self->model_class;
-    load_class($model_class);
     return $model_class->new( _record => $self->$orig($params) );
 };
 
