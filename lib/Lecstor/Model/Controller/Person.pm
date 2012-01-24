@@ -1,5 +1,5 @@
 package Lecstor::Model::Controller::Person;
-use Any::Moose;
+use Moose;
 
 # ABSTRACT: interface to person records
 

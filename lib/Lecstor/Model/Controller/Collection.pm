@@ -1,5 +1,5 @@
 package Lecstor::Model::Controller::Collection;
-use Any::Moose;
+use Moose;
 
 # ABSTRACT: interface to product collection records
 

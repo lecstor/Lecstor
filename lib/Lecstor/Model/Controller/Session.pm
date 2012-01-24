@@ -1,5 +1,5 @@
 package Lecstor::Model::Controller::Session;
-use Any::Moose;
+use Moose;
 
 # ABSTRACT: interface to session records
 

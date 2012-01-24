@@ -1,5 +1,5 @@
 package Lecstor::Model::Instance::User;
-use Any::Moose;
+use Moose;
 use DateTime;
 use Scalar::Util 'blessed';
 use Lecstor::X;

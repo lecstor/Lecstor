@@ -1,5 +1,5 @@
 package Lecstor::X;
-use Any::Moose;
+use Moose;
 with qw(Throwable::X StackTrace::Auto);
 
 # ABSTRACT: base exception class

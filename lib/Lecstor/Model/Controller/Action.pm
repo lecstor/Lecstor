@@ -1,5 +1,5 @@
 package Lecstor::Model::Controller::Action;
-use Any::Moose;
+use Moose;
 
 # ABSTRACT: interface to action records
 

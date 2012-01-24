@@ -1,6 +1,6 @@
 package Lecstor::Model::Controller;
-use Any::Moose;
-use Any::Moose 'X::StrictConstructor';
+use Moose;
+use MooseX::StrictConstructor;
 use DateTime;
 
 # ABSTRACT: interface to a set of model objects

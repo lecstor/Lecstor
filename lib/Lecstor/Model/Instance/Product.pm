@@ -1,5 +1,5 @@
 package Lecstor::Model::Instance::Product;
-use Any::Moose;
+use Moose;
 use DateTime;
 
 extends 'Lecstor::Model::Instance';

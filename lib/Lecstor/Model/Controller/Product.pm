@@ -1,5 +1,5 @@
 package Lecstor::Model::Controller::Product;
-use Any::Moose;
+use Moose;
 
 # ABSTRACT: interface to product records
 

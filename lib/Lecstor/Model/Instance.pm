@@ -1,6 +1,6 @@
 package Lecstor::Model::Instance;
-use Any::Moose;
-use Any::Moose 'X::StrictConstructor';
+use Moose;
+use MooseX::StrictConstructor;
 
 has '_record' => (
     isa => 'Object', is => 'ro',

@@ -1,5 +1,5 @@
 package Lecstor::Model::Instance::Session;
-use Any::Moose;
+use Moose;
 use DateTime;
 
 extends 'Lecstor::Model::Instance';
