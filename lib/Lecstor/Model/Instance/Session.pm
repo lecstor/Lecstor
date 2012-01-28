@@ -26,9 +26,8 @@ sub user{
     my ($self) = @_;
     my $user = $self->_record->user;
     my $user_class = $self->user_instance_class;
-    return $user ?
-        $user_class->new('_record' => $user )
-        : $user_class->new();
+    $user = $user_class->new('_record' => $user ) if $user && !$user->isa($user_class);
+    return $user || $user_class->new();
 }
 
 sub data{
