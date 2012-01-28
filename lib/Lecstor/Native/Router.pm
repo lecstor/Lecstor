@@ -1,6 +1,6 @@
 package Lecstor::Native::Router;
-use Mouse;
-use Mouse::Util;
+use Moose;
+use Router::Simple;
 
 =head1 SYNOPSIS
 
@@ -30,7 +30,6 @@ has router => (
 );
 
 sub _build_router{
-    Mouse::Util::load_class('Router::Simple');
     return Router::Simple->new;
 }
 
@@ -51,26 +50,28 @@ a hashref describing uri routes.
 
 =cut
 
-has routes => ( is => 'ro', isa => 'HashRef', lazy_build => 1 );
+has routes => ( is => 'ro', isa => 'ArrayRef', lazy_build => 1 );
 
 sub _build_routes{
-    {
+    [
         Root => [
             [ '/' => 'index', method => 'GET' ],
         ],
-    }
+    ]
 }
 
 sub BUILD{
     my ($self) = @_;
     my $router = $self->router;
-    foreach my $ctrl_class (keys %{$self->routes}){
-        my $norm_ctrl_class = $ctrl_class;
-        $norm_ctrl_class = $self->controller_base_class.'::'.$norm_ctrl_class unless $norm_ctrl_class =~ s/^\+//;
-        foreach my $route (@{$self->routes->{$ctrl_class}}){
+    my @ctrl_classes = @{$self->routes};
+    while(@ctrl_classes){
+        my ($ctrl_class, $routes) = (shift @ctrl_classes, shift @ctrl_classes);
+        $ctrl_class = $self->controller_base_class.'::'.$ctrl_class unless $ctrl_class =~ s/^\+//;
+        foreach my $route (@$routes){
             my ($path, $method, %opts) = @$route;
-            $router->connect( $path, { controller => $norm_ctrl_class, action => $method }, \%opts );
+            $router->connect( $path, { controller => $ctrl_class, action => $method }, \%opts );
         }
+
     }
 }
 

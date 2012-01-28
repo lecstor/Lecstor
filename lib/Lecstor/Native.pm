@@ -1,5 +1,5 @@
 package Lecstor::Native;
-use Mouse;
+use Moose;
 use Class::Load;
 
 use Template;

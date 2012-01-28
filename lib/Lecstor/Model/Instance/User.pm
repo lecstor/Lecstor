@@ -15,8 +15,19 @@ has '_record' => (
         username email person password
         update 
         roles
-    !]
+    !],
+    clearer => 'clear__record',
 );
+
+sub as_hash{
+    my ($self) = @_;
+    return {
+        id => $self->id,
+        email => $self->email,
+        username => $self->username,
+        person => $self->person ? $self->person->as_hash : 0,
+    };
+}
 
 =method set_record
 
@@ -27,6 +38,24 @@ has '_record' => (
 sub set_record{
     my ($self, $user) = @_;
     $self->_record($user->_record);
+}
+
+=method login
+
+=cut
+
+sub login{
+    my ($self, $user) = @_;
+    $self->set_record($user);
+}
+
+=method logout
+
+=cut
+
+sub logout{
+    my ($self) = @_;
+    $self->clear__record;
 }
 
 =method check_password

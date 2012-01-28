@@ -1,10 +1,11 @@
 package Lecstor::Model::Controller::Action;
 use Moose;
+use Lecstor::Model::Instance::Action;
 
 # ABSTRACT: interface to action records
 
 extends 'Lecstor::Model::Controller';
-with 'Lecstor::Role::RequestData';
+#with 'Lecstor::Role::RequestData';
 
 sub resultset_name{ 'Action' }
 
