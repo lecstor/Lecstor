@@ -1,14 +1,13 @@
 package Lecstor::Model::Controller::User;
 use Moose;
-use Class::Load ('load_class');
 use Lecstor::Error;
 
 # ABSTRACT: interface to user records
 
 extends 'Lecstor::Model::Controller';
 
-with 'Lecstor::Role::RequestData';
-with 'Lecstor::Role::ActionLogger';
+#with 'Lecstor::Role::RequestData';
+#with 'Lecstor::Role::ActionLogger';
 
 
 sub resultset_name{ 'User' }
@@ -73,7 +72,6 @@ around 'create' => sub{
     # set user active by default
     $params->{active} = 1 unless exists $params->{active};
     my $model_class = $self->model_class;
-    load_class($model_class);
     return $model_class->new( _record => $self->$orig($params) );
 };
 
@@ -86,40 +84,24 @@ sub register{
 
     my $v = $self->validator->class('registration', params => $params);
 
-    my $result;
+    Lecstor::X::Valid->throw({
+        ident => 'register fail',
+        message => 'Invalid Input',
+        fields => $v->error_fields,
+        validation => 'registration',
+    }) unless $v->validate;
 
-    if ( $v->validate ){
-        # input valid
-        if ($self->find({ email => $params->{email} })){
-            # email already registered
-            my $error = 'That email address is already registered';
-            $self->log_action('register fail', { email => $params->{email}, error => $error });
-            return Lecstor::Error->new({ error => $error });
-        }
-        if ($params->{username} && $self->find({ username => $params->{username} })){
-            # username already registered
-            my $error = 'That username is already registered';
-            $self->log_action('register fail', { username => $params->{username}, error => $error });
-            return Lecstor::Error->new({ error => $error });
-        }
-        # params ok
-        $result = $self->create($v->get_params_hash);
-    } else {
-        # invalid input
-        $self->log_action(
-            'register fail', {
-                username => $params->{email},
-                errors => $v->error_fields,
-                validation => 'registration',
-            }
-        );
-        $result = Lecstor::Error->new({
-            error_fields => $v->error_fields,
-            error => $v->errors_to_string,
-        });
-    }
+    Lecstor::X->throw({
+        ident => 'register fail',
+        message => 'That email address is already registered',
+    }) if $self->find({ email => $params->{email} });
 
-    return $result;
+    Lecstor::X->throw({
+        ident => 'register fail',
+        message => 'That username is already registered',
+    }) if $params->{username} && $self->find({ username => $params->{username} });
+
+    return $self->create($v->get_params_hash);
 
 }
 

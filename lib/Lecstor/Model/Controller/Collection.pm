@@ -1,6 +1,5 @@
 package Lecstor::Model::Controller::Collection;
 use Moose;
-use Class::Load ('load_class');
 
 # ABSTRACT: interface to product collection records
 
@@ -35,7 +34,6 @@ CollectionType set.
 around 'create' => sub{
     my ($orig, $self, $params) = @_;
     my $model_class = $self->model_class;
-    load_class($model_class);
     return $model_class->new( _record => $self->$orig($params) );
 };
 

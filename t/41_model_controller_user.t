@@ -19,6 +19,8 @@ use_ok('Lecstor::Model::Controller::User');
 use_ok('Lecstor::Model::Controller::Person');
 use_ok('Lecstor::Model::Controller::Action');
 use_ok('Lecstor::Model::Instance::User');
+use_ok('Lecstor::Model::Instance::Action');
+use_ok('Lecstor::Model::Instance::Person');
 use_ok('Lecstor::Request');
 use_ok('Lecstor::Valid');
 

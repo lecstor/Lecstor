@@ -12,6 +12,7 @@ use Test::DBIx::Class {
 }, 'Person';
 
 use_ok('Lecstor::Model::Controller::Action');
+use_ok('Lecstor::Model::Instance::Action');
 use_ok('Lecstor::Model::Instance::User');
 
 my $session_id = time;

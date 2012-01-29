@@ -8,6 +8,8 @@ use Lecstor::Model::Controller::User;
 use Lecstor::Model::Controller::Collection;
 use Lecstor::Model::Controller::Product;
 use Lecstor::Model::Instance::User;
+use Lecstor::Model::Instance::Person;
+use Lecstor::Model::Instance::Action;
 use Lecstor::Request;
 
 has schema => ( isa => 'DBIx::Class::Schema', is => 'ro' );

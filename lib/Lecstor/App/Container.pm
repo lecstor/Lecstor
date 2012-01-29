@@ -38,13 +38,17 @@ sub _build_app_class{ 'Lecstor::App' }
 
 =attr template_processor
 
-=cut
+#=cut
 
 has template_processor => (
     is      => 'ro',
     isa     => 'Object',
     required => 1,
 );
+
+=attr empty_user
+
+=cut
 
 has empty_user => ( is => 'ro', isa => 'Object', lazy_build => 1 );
 
@@ -68,7 +72,7 @@ sub _build_builder {
 
     my $c = container 'Lecstor' => [ 'Model', 'Request' ] => as {
   
-        service template_processor => $self->template_processor;
+#        service template_processor => $self->template_processor;
  
         service error_class => 'Lecstor::Error';
 
@@ -103,7 +107,7 @@ sub _build_builder {
                 session => depends_on('session'),
                 model => depends_on('Model/model'),
                 request => depends_on('Request/request'),
-                template_processor => depends_on('template_processor'),
+#                template_processor => depends_on('template_processor'),
                 validator => depends_on('Model/validator'),
                 error_class => depends_on('error_class'),
                 action_ctrl => depends_on('Model/action'),

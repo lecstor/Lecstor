@@ -41,15 +41,37 @@ sub BUILD{
     shift->update_view;
 }
 
-has session => ( is => 'ro', isa => 'Object', required => 1 );
+has 'session_fetcher' => (
+    traits  => ['Code'],
+    is      => 'ro',
+    isa     => 'CodeRef',
+    handles => { session => 'execute_method' },
+    required => 1,
+);
 
-has user => ( is => 'rw', isa => 'Object', required => 1 );
+#has session => ( is => 'ro', isa => 'Object', builder => '_build_session' );
+
+has 'user_fetcher' => (
+    traits  => ['Code'],
+    is      => 'ro',
+    isa     => 'CodeRef',
+    handles => { user => 'execute_method' },
+    required => 1,
+);
+
+#has user => ( is => 'rw', isa => 'Object', default => sub{ $_[0]->fetch_user } );
 
 =attr model
 
 =cut
 
 has model => ( is => 'ro', isa => 'Object', required => 1 );
+
+=attr view
+
+=cut
+
+has view => ( is => 'ro', isa => 'Object', required => 1 );
 
 =attr request
 
@@ -73,17 +95,13 @@ sub _build_response{
 
 has validator => ( is => 'ro', isa => 'Object', required => 1 );
 
-=attr template_processor
-
-=cut
-
-has template_processor => ( is => 'ro', isa => 'Object', required => 1 );
-
 =attr error_class
 
 =cut
 
-has error_class => ( is => 'ro', isa => 'Str', required => 1 );
+has error_class => ( is => 'ro', isa => 'Str', lazy_build => 1 );
+
+sub _build_error_class{ 'Lecstor::Error' }
 
 sub error{
     my ($self, $args) = @_;
