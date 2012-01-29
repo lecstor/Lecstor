@@ -1,203 +1,111 @@
 package Lecstor::App;
 use Moose;
-use MooseX::Params::Validate;
 use MooseX::StrictConstructor;
-use Class::Load 'load_class';
-use Lecstor::Response;
+use File::Slurp qw(read_file);
+use YAML::XS;
 
-=method current_user
+has schema => ( is => 'ro', isa => 'Object', lazy_build => 1 );
 
-=cut
-
-sub current_user{ shift->user }
-
-=method current_session_id
-
-=cut
-
-sub current_session_id{ shift->request->session_id }
-
-with 'Lecstor::Role::ActionLogger';
-
-=head1 SYNOPSIS
-
-    my $app = Lecstor::App->new(
-        model = Lecstor::App::Model->new(
-            schema => Lecstor::Schema->connect($connect_args),
-        ),
-        template_processor => $tt,
-        product_search_config => {
-            index_path => 'path/to/index/directory',
-            create => 1,
-            truncate => 1,
-        }
-    );
-
-    my $person_set = $app->model->person;
-
-=cut
-
-sub BUILD{
-    shift->update_view;
-}
-
-has 'session_fetcher' => (
-    traits  => ['Code'],
-    is      => 'ro',
-    isa     => 'CodeRef',
-    handles => { session => 'execute_method' },
-    required => 1,
-);
-
-#has session => ( is => 'ro', isa => 'Object', builder => '_build_session' );
-
-has 'user_fetcher' => (
-    traits  => ['Code'],
-    is      => 'ro',
-    isa     => 'CodeRef',
-    handles => { user => 'execute_method' },
-    required => 1,
-);
-
-#has user => ( is => 'rw', isa => 'Object', default => sub{ $_[0]->fetch_user } );
-
-=attr model
-
-=cut
-
-has model => ( is => 'ro', isa => 'Object', required => 1 );
-
-=attr view
-
-=cut
-
-has view => ( is => 'ro', isa => 'Object', required => 1 );
-
-=attr request
-
-=cut
-
-has request => ( is => 'ro', isa => 'Object', required => 1 );
-
-=attr response
-
-=cut
-
-has response => ( is => 'ro', isa => 'Object', lazy_build => 1 );
-
-sub _build_response{
-    Lecstor::Response->new({ view => { uri => $_[0]->request->uri }});
-}
-
-=attr validator
-
-=cut
-
-has validator => ( is => 'ro', isa => 'Object', required => 1 );
-
-=attr error_class
-
-=cut
-
-has error_class => ( is => 'ro', isa => 'Str', lazy_build => 1 );
-
-sub _build_error_class{ 'Lecstor::Error' }
-
-sub error{
-    my ($self, $args) = @_;
-    my $class = $self->error_class;
-    return $class->new($args);
-}
-
-sub login{
-    my ($self, $user) = @_;
-    my $session = $self->session->set_user($user);
-    $self->user->_record($user->_record);
-    $self->update_view;
-}
-
-sub update_view{
+sub base_app_class{
     my ($self) = @_;
-    my $user = $self->user;
-    if ($user){
-        my $visitor = {
-#          %{$self->view->{visitor} || {}},
-          logged_in => 1,
-          email => $user->email,
-          name => $user->username,
-          username => $user->username,
-          user_id => $user->id,
-        };
-        $visitor->{name} ||= $user->person->name if $user->person;
-        $self->response->view({ visitor => $visitor });
-    }
+    my $base = ref $self;
+    $base =~ s/::App$//;
+    return $base;
 }
 
-=method log_action
-
-#=cut
-
-sub log_action{
-    my ($self, $type, $data) = @_;
-
-    my $action = {
-        type => { name => $type },
-        session => $self->request->session_id,
-    };
-    $action->{data} = $data if $data;
-    $action->{user} = $self->request->user->id if $self->request->user;
-
-    $self->model->action->create($action);
+sub _build_schema{
+    my ($self) = @_;
+    my $schema_class = $self->config->{'Model::Schema'}{schema_class};
+    die 'Schema config not set' unless $schema_class;
+    return $schema_class->connect(@{$self->config->{'Model::Schema'}{connect_info}});
 }
 
-=method run_after_request
+has model => ( is => 'ro', isa => 'Object', lazy_build => 1 );
 
-NOT IMPLEMENTED - executes code immediately
-
-#=cut
-
-sub run_after_request{
-    my ($self, $code) = @_;
-    eval{ &$code() };
+sub _build_model{
+    my ($self) = @_;
+    my $app_model_class = $self->base_app_class . '::Model';
+    $app_model_class->new(
+        schema => $self->schema,
+        validator => $self->validator,
+    );
 }
 
-=method register
+has validator => ( is => 'ro', isa => 'Object', lazy_build => 1 );
 
-#=cut
+sub _build_validator{
+    my ($self) = @_;
+    my $app_valid_class = $self->base_app_class . '::Valid';
+    return $app_valid_class->new;
+}
 
-sub register{
-    my ($self,$params) = @_;
+has config_file => ( is => 'ro', isa => 'Str', lazy_build => 1 );
 
-    my $v = $self->validator->class('registration', params => $params);
+sub _build_config_file{
+    my ($self) = @_;
+    my $app_class = ref $self;
+    my $conf = lc($app_class);
+    $conf =~ s/::/_/g;
+    $conf .= '.yml';
+    return $conf;
+}
 
-    my $result;
+has config => ( is => 'ro', isa => 'HashRef', lazy_build => 1 );
 
-    if ( $v->validate ){
-        # input valid
-        if ($self->model->user->find({ email => $params->{email} })){
-            # email already registered
-            my $error = 'That email address is already registered';
-            $self->log_action('register fail', { email => $params->{email}, error => $error });
-            $result = $self->error({ error => $error });
-        } else {
-            # params ok
-            $result = $self->model->user->create($v->get_params_hash);
-        }
+sub _build_config{
+    my ($self) = @_;
+    my $debug = $ENV{LECSTOR_DEBUG};
+    my $config_file = $self->config_file;
+    my $conf_data = {};
+    if (-e $config_file){
+        warn "Loading config: $config_file" if $debug;
+        $conf_data = YAML::XS::Load(scalar read_file($config_file));
     } else {
-        # invalid input
-        $self->log_action('register fail', { username => $params->{email}, errors => $v->error_fields });
-        $result = $self->error({
-            error_fields => $v->error_fields,
-            error => $v->errors_to_string,
-        });
+        warn "Config Missing: $config_file" if $debug;
     }
-
-    return $result;
+    if ($ENV{LECSTOR_DEPLOY}){
+        $config_file =~ s/\./_$ENV{LECSTOR_DEPLOY}./;
+        if (-e $config_file){
+            warn "Loading config: $config_file" if $debug;
+            $conf_data = Hash::Merge::merge( YAML::XS::Load(scalar read_file($config_file)), $conf_data);
+        } else {
+            warn "Deploy Config Missing: $config_file" if $debug;
+        }
+    }
+    warn Data::Dumper->Dumper($conf_data) if $debug;
+    return $conf_data;
 }
 
-=cut
+has log => ( is => 'ro', isa => 'Lecstor::Log', lazy_build => 1 );
+
+sub _build_log{
+    my ($self) = @_;
+    Lecstor::Log->new( action_ctrl => $self->model->action );
+}
+
+has template => ( is => 'ro', isa => 'Lecstor::Native::Component', lazy_build => 1 );
+
+sub _build_template{
+    my ($self) = @_;
+    Lecstor::Native::Component::Template->new(
+        processor => Template::AutoFilter->new({
+            INCLUDE_PATH => $self->template_include_paths,
+            LOAD_PLUGINS => [
+              Lecstor::Template::Plugins::Allow->new(@{$self->template_allowed_plugins}),
+              Template::Plugins->new(),
+            ],
+        }),
+    );
+}
+
+has template_include_paths => ( is => 'ro', isa => 'ArrayRef', lazy_build => 1 );
+
+sub _build_template_include_paths{ ['root'] }
+
+has template_allowed_plugins => ( is => 'ro', isa => 'ArrayRef', lazy_build => 1 );
+
+sub _build_template_allowed_plugins{ [qw! Date Table Dumper !] }
 
 __PACKAGE__->meta->make_immutable;
 
 1;
-

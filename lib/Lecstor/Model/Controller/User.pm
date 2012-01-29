@@ -75,6 +75,16 @@ around 'create' => sub{
     return $model_class->new( _record => $self->$orig($params) );
 };
 
+=method empty_user
+
+=cut
+
+sub empty_user{
+    my ($self) = @_;
+    my $user_class = $self->model_class;
+    return $user_class->new();
+}
+
 =method register
 
 =cut

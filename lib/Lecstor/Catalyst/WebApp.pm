@@ -1,19 +1,17 @@
-package Lecstor::Native::WebApp;
+package Lecstor::Catalyst::WebApp;
 use Moose;
 use MooseX::StrictConstructor;
 
 # ABSTRACT: App Component Container
 
-#extends 'Lecstor::App';
-
 has _request => (
     is => 'ro',
-    handles => [qw! session user request req response res stash count counts!],
+    handles => [qw! session request user req !],
 );
 
 has _app => (
     is => 'ro',
-    handles => [qw! model view validator config log template !],
+    handles => [qw! model validator config log template !],
 );
 
 =attr config
@@ -24,15 +22,18 @@ has _app => (
 
 =attr log
 
+=cut
+
 =method login
 
-  $app->login($user);
+    $app->login($user);
 
 =cut
 
 sub login{
     my ($self, $user) = @_;
-    $self->session->set_user($user);
+warn "webapp login: ".(ref $user);
+#    $self->session->set_user($user);
     $self->user->set_record($user);
 }
 

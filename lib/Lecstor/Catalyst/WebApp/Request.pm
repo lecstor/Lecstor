@@ -1,37 +1,12 @@
-package Lecstor::Native::Request;
+package Lecstor::Catalyst::WebApp::Request;
 use Moose;
 use MooseX::Aliases;
 
-has [qw!session user !] => (
+has [qw! session user !] => (
     is => 'ro',
 );
 
 has request => ( is => 'ro', isa => 'Object', alias => 'req' );
-
-has response => ( is => 'ro', isa => 'Object', alias => 'res' );
-
-=attr counts
-
-store a count of various things.
-eg this is used to cound tthe number of redirects that have happened
-during the current request.
-
-=cut
-
-has counts => ( is => 'ro', isa => 'HashRef', default => sub{{}} );
-
-=method counts
-
-    my $count = $container->count('redirect');
-
-increments the named count by one and returns the result.
-
-=cut
-
-sub count{
-    my ($self, $name) = @_;
-    return ++$self->counts->{$name};
-}
 
 =attr stash
 

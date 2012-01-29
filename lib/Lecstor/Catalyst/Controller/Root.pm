@@ -24,7 +24,12 @@ Lecstor::Shop::Catalyst::Controller::Root - Root Controller for Lecstor::Shop::C
 
 =cut
 
-sub setup :Chained('/') :PathPart('') :CaptureArgs(0){}
+sub setup :Chained('/') :PathPart('') :CaptureArgs(0){
+    my ( $self, $c ) = @_;
+    if ($c->user_exists){
+        $c->lecstor->login($c->user->user_object);
+    }
+}
 
 =method full_page
 

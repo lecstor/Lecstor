@@ -11,7 +11,21 @@ BEGIN { extends 'Catalyst::Controller' }
 
 =cut
 
-sub setup :Chained('/') :PathPart('') :CaptureArgs(0){}
+sub setup :Chained('/') :PathPart('') :CaptureArgs(0){
+    my ( $self, $c ) = @_;
+    if ($c->user_exists){
+        $c->lecstor->login($c->user->user_object);
+    }
+    $c->stash({
+        session => {
+            user => $c->user_exists ? $c->user->user_object : undef,
+            id => $c->sessionid,
+        },
+        request => {
+            path_info => '/'.$c->req->path_info,
+        },
+    });
+}
 
 =method restricted
 
@@ -49,7 +63,7 @@ sub register :Chained('setup') :PathPart('register') :Args(0){
         if ($result->isa('Lecstor::Error')){
             $c->stash->{error} = $result;
         } else {
-            $c->stash->{user} = $result;
+            $c->stash->{session}{user} = $result;
             $c->authenticate({ email => $params->{email}, password => $params->{password} });
             $app->login($result);
         }
@@ -60,7 +74,11 @@ sub register :Chained('setup') :PathPart('register') :Args(0){
     $c->stash({
         template => 'account/register.tt',
         params => $params,
-        view => $app->response->view({ page => { title => 'Register' }}),
+        request => {
+            path_info => '/'.$c->req->path_info,
+        },
+#        %{$app->request->stash},
+#        view => $app->response->view({ page => { title => 'Register' }}),
     });
 }
 

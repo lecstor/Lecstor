@@ -1,10 +1,8 @@
-package Lecstor::Native::WebApp;
+package Lecstor::WebApp;
 use Moose;
 use MooseX::StrictConstructor;
 
-# ABSTRACT: App Component Container
-
-#extends 'Lecstor::App';
+# ABSTRACT: WebApp Component Container
 
 has _request => (
     is => 'ro',
@@ -32,8 +30,8 @@ has _app => (
 
 sub login{
     my ($self, $user) = @_;
-    $self->session->set_user($user);
-    $self->user->set_record($user);
+    $app->session->set_user($user);
+    $app->user->set_record($user);
 }
 
 =method authenticate
