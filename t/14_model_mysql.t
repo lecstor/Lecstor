@@ -1,6 +1,13 @@
 use strict;
 use warnings;
 use Test::More;
+
+BEGIN {
+    eval "use Test::mysqld"; if($@) {
+        plan skip_all => 'Test::mysqld not installed';
+    }
+}
+
 use Data::Dumper;
 use DateTime;
 
@@ -13,6 +20,7 @@ use Lecstor::Test::DateTime '2012-01-01 14:00:00';
 
 use Test::DBIx::Class {
     config_path => [ File::Spec->splitdir($Bin), qw(etc schema_base) ],
+    traits => [qw!Testmysqld!],
 };
 
 fixtures_ok 'login'

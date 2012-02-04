@@ -4,7 +4,9 @@ use Class::Load 'load_class';
 use namespace::autoclean;
 
 use Lecstor::Catalyst::WebApp;
-use Lecstor::Catalyst::WebApp::Request;
+use Lecstor::Catalyst::Component::Session;
+
+use Lecstor::WebApp::Context;
 
 extends 'Catalyst::Model';
 with 'Catalyst::Component::InstancePerContext';
@@ -14,14 +16,24 @@ sub build_per_context_instance {
 
     my $app = $ctx->model('LecstorApp');
 
-    $ctx->session;
+#    $ctx->session;
+
+    my $user = $ctx->user_exists ? $ctx->user->user_object : $app->model->user->empty_user;
+
+    $ctx->stash->{session} = Lecstor::Catalyst::Component::Session->new(
+        session => $ctx->session,
+        sessionid => $ctx->sessionid,
+        user => $user,
+    );
+    $ctx->stash->{request} = $ctx->req;
 
     return Lecstor::Catalyst::WebApp->new(
         _app => $app,
-        _request => Lecstor::Catalyst::WebApp::Request->new(
+        _request => Lecstor::WebApp::Context->new(
             request => $ctx->req,
-            session => $ctx->session,
-            user => $ctx->user_exists ? $ctx->user->user_object : $app->model->user->empty_user,
+            response => $ctx->res,
+            session => $ctx->stash->{session},
+            user => $user,
         ),
     );
 

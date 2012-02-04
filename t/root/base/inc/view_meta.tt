@@ -1,3 +1,9 @@
 <!-- VIEW META
-  uri: "[% view.uri.path %]"
+  uri: "[% request.path_info %]"
+[% IF session.user -%]
+  user: [% session.user.id %]
+[% ELSE -%]
+  user: ~
+[% END %]
+  session_id: [% session.id %]
 -->

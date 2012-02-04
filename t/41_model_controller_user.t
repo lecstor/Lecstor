@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 use Try::Tiny;
+use Test::Exception;
 
 use FindBin qw($Bin);
 use lib "$Bin/lib";
@@ -30,15 +31,8 @@ my $current_user = Lecstor::Model::Instance::User->new();
 
 ok my $user_ctrl = Lecstor::Model::Controller::User->new({
     schema => Schema,
-    current_session_id => $session_id,
-    current_user => $current_user,
     validator => $validator,
     person_ctrl => Lecstor::Model::Controller::Person->new({ schema => Schema }),
-    action_ctrl => Lecstor::Model::Controller::Action->new({
-        schema => Schema,
-        current_session_id => $session_id,
-        current_user => $current_user,
-    }),
 }), 'get controller ok';
 
 ok my $user = $user_ctrl->create({
@@ -69,28 +63,26 @@ ok my $user2 = $user_ctrl->find_or_create({ username => 'lecstor2' }), 'find_or_
 is $user2->id, $user_id+1, 'id ok';
 isa_ok $user2, 'Lecstor::Model::Instance::User';
 
-
-$user = $user_ctrl->register({
+throws_ok { $user_ctrl->register({
     username => 'lecstor',
     email => 'jason@lecstor.com',
-});
-ok !$user, 'register failed';
-is $user->error, 'That email address is already registered', 'error message ok';
+}) } 'Lecstor::X', 'Lecstor::X thrown';
+is $@->message, 'That email address is already registered', 'error message ok';
 
-$user = $user_ctrl->register({
+throws_ok { $user_ctrl->register({
     username => 'lecstor',
     email => 'jason@lecstor.com',
     password => '',
-});
-ok !$user, 'register failed';
-is $user->error, 'Password is required', 'error message ok';
+}) } 'Lecstor::X', 'Lecstor::X thrown';
+is $@->message, 'Invalid Input', 'error message ok';
+is $@->fields->{password}[0], 'Password is required', 'error message ok';
 
-$user = $user_ctrl->register({
+throws_ok { $user_ctrl->register({
     username => 'lecstor',
     email => 'test1@eightdegrees.com.au',
     password => 'aaaaaaaa',
-});
-is $user->error, 'That username is already registered', 'error message ok';
+}) } 'Lecstor::X', 'Lecstor::X thrown';
+is $@->message, 'That username is already registered', 'error message ok';
 
 ok $user = $user_ctrl->register({
     email => 'test1@eightdegrees.com.au',

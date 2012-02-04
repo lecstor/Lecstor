@@ -5,7 +5,7 @@ use Try::Tiny;
 # ABSTRACT: Generate a PSGI compatible Application
 
 use Lecstor::PSGI::Request;
-use Lecstor::Native::WebApp;
+use Lecstor::WebApp;
 use Digest;
 
 =head1 SYNOPSIS
@@ -106,15 +106,17 @@ sub session{
     return $self->app->model->session->instance($session_id);
 }
 
-=method webapp_request_class
+=attr webapp_context_class
 
-Returns the WebApp class..
+Returns the WebApp Context class..
 
-see L<Lecstor::Native::Request>
+see L<Lecstor::WebApp::Context>
 
 =cut
 
-sub webapp_request_class{ 'Lecstor::Native::Request' }
+has webapp_context_class => ( is => 'ro', isa => 'Str', lazy_build => 1 );
+
+sub _build_webapp_context_class{ 'Lecstor::WebApp::Context' }
 
 =method webapp_request
 
@@ -136,9 +138,9 @@ sub webapp_request{
     my $response = $req->new_response(200);
     $response->cookies->{$self->session_cookie_name} = $session->id;
 
-    my $webapp_request_class = $self->webapp_request_class;
+    my $webapp_context_class = $self->webapp_context_class;
 
-    return $webapp_request_class->new(
+    return $webapp_context_class->new(
         session => $session,
         user => $session->user,
         request => $req,
@@ -162,6 +164,18 @@ router.
 
 has app => ( is => 'ro', isa => 'Object', required => 1 );
 
+=attr webapp_class
+
+your DBIx::Class::Schema class name
+
+see L<Lecstor::Schema>
+
+=cut
+
+has webapp_class => ( is => 'ro', isa => 'Str', lazy_build => 1 );
+
+sub _build_webapp_class{ 'Lecstor::WebApp' }
+
 =method request_app
 
     my $app = $web->request_app($request);
@@ -174,7 +188,8 @@ methods to whichever is supplying the components.
 sub request_app{
     my ($self, $req) = @_;
     my $req_container = $self->webapp_request($req);
-    return Lecstor::Native::WebApp->new(
+    my $webapp_class = $self->webapp_class;
+    return $webapp_class->new(
         _request => $req_container,
         _app => $self->app,
     );

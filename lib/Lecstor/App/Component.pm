@@ -1,4 +1,4 @@
-package Lecstor::Native::Component;
+package Lecstor::App::Component;
 use Moose;
 
 

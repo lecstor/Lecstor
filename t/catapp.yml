@@ -1,6 +1,6 @@
 home: t/
 root: t/root
-default_user_uri: /
+default_user_uri: /uri/test
 lecstor:
   product_search:
     index_path: 'path/to/index/directory'
@@ -8,6 +8,18 @@ lecstor:
     index_truncate: 1
 Model::Schema:
   schema_class: Lecstor::Schema
+  connect_info:
+    - 'dbi:SQLite:dbname=test.db'
+    - ''
+    - ''
+    - 
+      AutoCommit: 1
+      RaiseError: 1
+    - 
+      name_sep: '.'
+      quote_char: '`'
+schema:
+  class: Lecstor::Schema
   connect_info:
     - 'dbi:SQLite:dbname=test.db'
     - ''

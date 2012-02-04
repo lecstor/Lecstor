@@ -20,8 +20,6 @@ my $current_user = Lecstor::Model::Instance::User->new();
 
 ok my $ctrl = Lecstor::Model::Controller::Action->new(
     schema => Schema,
-    current_session_id => $session_id,
-    current_user => $current_user,
 ), 'get person_ctrl ok';
 
 ok my $instance = $ctrl->create({

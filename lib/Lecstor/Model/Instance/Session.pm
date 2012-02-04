@@ -22,6 +22,11 @@ sub set_user{
     $self->update({ user => $user->_record });
 }
 
+sub clear_user{
+    my ($self) = @_;
+    $self->update({ user => undef });
+}
+
 sub user{
     my ($self) = @_;
     my $user = $self->_record->user;

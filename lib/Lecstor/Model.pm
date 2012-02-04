@@ -1,12 +1,10 @@
 package Lecstor::Model;
 use Moose;
 
-use Lecstor::Model::Instance::Action;
-use Lecstor::Model::Instance::Person;
-use Lecstor::Model::Instance::User;
-use Lecstor::Model::Instance::Collection;
-use Lecstor::Model::Instance::Product;
-use Lecstor::Model::Instance::Session;
+use Lecstor::Model::Controller::Action;
+use Lecstor::Model::Controller::Person;
+use Lecstor::Model::Controller::User;
+use Lecstor::Model::Controller::Session;
 
 =head1 SYNOPSIS
 
@@ -22,6 +20,16 @@ use Lecstor::Model::Instance::Session;
 
 =attr schema
 
+=cut
+
+has schema => ( is => 'ro', isa => 'Object', required => 1 );
+
+=attr validator
+
+=cut
+
+has validator => ( is => 'ro', isa => 'Object', required => 1 );
+
 =attr action
 
 =attr person
@@ -36,15 +44,59 @@ use Lecstor::Model::Instance::Session;
 
 =cut
 
-#has schema => ( is => 'ro', isa => 'DBIx::Class::Schema', required => 1 );
+#has [qw! product_indexer product_searcher !] => (
+#    is => 'ro', isa => 'Object', required => 1
+#);
 
-has [qw! product_indexer product_searcher !] => (
-    is => 'ro', isa => 'Object', required => 1
+# Lecstor - schema & validator
+foreach my $class (qw!  !){
+    my $full_class = 'Lecstor::Model::Controller::'.$class;
+    my $attr = lc($class);
+    has $attr => (
+        is => 'ro', isa => 'Lecstor::Model::Controller', lazy => 1,
+        default => sub{
+            my ($self) = @_;
+            $full_class->new(
+                schema => $self->schema,
+                validator => $self->validator,
+            );
+        }
+    );
+}
+
+# Lecstor - only schema
+# Collection Product 
+foreach my $class (qw! Action Person Session !){
+    my $full_class = 'Lecstor::Model::Controller::'.$class;
+    my $attr = lc($class);
+    has $attr => (
+        is => 'ro', isa => 'Lecstor::Model::Controller', lazy => 1,
+        default => sub{
+            my ($self) = @_;
+            $full_class->new(
+                schema => $self->schema,
+            );
+        }
+    );
+}
+
+=attr user
+
+=cut
+
+has user => (
+    is => 'ro', isa => 'Lecstor::Model::Controller', lazy_build => 1
 );
 
-has [qw! action person user collection product session !] => (
-    is => 'ro', isa => 'Lecstor::Model::Controller', required => 1
-);
+sub _build_user{
+    my ($self) = @_;
+    Lecstor::Model::Controller::User->new(
+        schema => $self->schema,
+        person_ctrl => $self->person,
+        validator => $self->validator,
+    );
+}
+
 
 __PACKAGE__->meta->make_immutable;
 

@@ -1,8 +1,7 @@
 <div class="well">
-  [% visitor = view.visitor %]
-  [% IF visitor.logged_in %]
+  [% IF session.user %]
     <p>Logged in as 
-      <a href="/account">[% IF visitor.name %][% visitor.name %] ([% visitor.email %])[% ELSE %][% visitor.email %][% END %]</a>
+      <a href="/account">Login: [% session.user.name || session.user.username || session.user.email %]</a>
     </p>
   [% ELSE %]
     <form class="login_or_register" action="/login_or_register" method="post">

@@ -1,54 +1,119 @@
 package Lecstor::App;
 use Moose;
 use MooseX::StrictConstructor;
-use File::Slurp qw(read_file);
-use YAML::XS;
+
+=attr schema_class
+
+your DBIx::Class::Schema class name
+
+see L<Lecstor::Schema>
+
+=cut
+
+has schema_class => ( is => 'ro', isa => 'Str', lazy_build => 1 );
+
+sub _build_schema_class{ 'Lecstor::Schema' }
+
+=attr schema
+
+your DBIx::Class::Schema class
+
+see L<Lecstor::Schema>
+
+=cut
 
 has schema => ( is => 'ro', isa => 'Object', lazy_build => 1 );
 
-sub base_app_class{
-    my ($self) = @_;
-    my $base = ref $self;
-    $base =~ s/::App$//;
-    return $base;
-}
-
 sub _build_schema{
     my ($self) = @_;
-    my $schema_class = $self->config->{'Model::Schema'}{schema_class};
-    die 'Schema config not set' unless $schema_class;
-    return $schema_class->connect(@{$self->config->{'Model::Schema'}{connect_info}});
+    my $schema_class = $self->schema_class;
+    return $schema_class->connect(@{$self->config->{schema}{connect_info}});
 }
+
+=attr model_class
+
+your model class name
+
+see L<Lecstor::Model>
+
+=cut
+
+has model_class => ( is => 'ro', isa => 'Str', lazy_build => 1 );
+
+sub _build_model_class{ 'Lecstor::Model' }
+
+=attr model
+
+your model class
+
+see L<Lecstor::Model>
+
+=cut
 
 has model => ( is => 'ro', isa => 'Object', lazy_build => 1 );
 
 sub _build_model{
     my ($self) = @_;
-    my $app_model_class = $self->base_app_class . '::Model';
-    $app_model_class->new(
+    my $model_class = $self->model_class;
+    $model_class->new(
         schema => $self->schema,
         validator => $self->validator,
     );
 }
 
+=attr validator_class
+
+your validator class name
+
+see L<Lecstor::Valid>
+
+=cut
+
+has validator_class => ( is => 'ro', isa => 'Str', lazy_build => 1 );
+
+sub _build_validator_class{ 'Lecstor::Valid' }
+
+=attr validator
+
+your validator class
+
+see L<Lecstor::Valid>
+
+=cut
+
 has validator => ( is => 'ro', isa => 'Object', lazy_build => 1 );
 
 sub _build_validator{
     my ($self) = @_;
-    my $app_valid_class = $self->base_app_class . '::Valid';
-    return $app_valid_class->new;
+    my $valid_class = $self->validator_class;
+    return $valid_class->new;
 }
+
+=attr config_file
+
+config file path
+
+defaults to package name as a yaml file.. eg
+
+  My::App becomes my_app.yml
+
+=cut
 
 has config_file => ( is => 'ro', isa => 'Str', lazy_build => 1 );
 
 sub _build_config_file{
     my ($self) = @_;
-    my $app_class = ref $self;
-    my $conf = lc($app_class);
+    my $conf = lc(ref $self);
     $conf =~ s/::/_/g;
     $conf .= '.yml';
     return $conf;
 }
+
+=attr config
+
+config as a hash reference
+
+=cut
 
 has config => ( is => 'ro', isa => 'HashRef', lazy_build => 1 );
 
@@ -59,7 +124,7 @@ sub _build_config{
     my $conf_data = {};
     if (-e $config_file){
         warn "Loading config: $config_file" if $debug;
-        $conf_data = YAML::XS::Load(scalar read_file($config_file));
+        $conf_data = YAML::XS::Load(scalar File::Slurp::read_file($config_file));
     } else {
         warn "Config Missing: $config_file" if $debug;
     }
@@ -67,7 +132,7 @@ sub _build_config{
         $config_file =~ s/\./_$ENV{LECSTOR_DEPLOY}./;
         if (-e $config_file){
             warn "Loading config: $config_file" if $debug;
-            $conf_data = Hash::Merge::merge( YAML::XS::Load(scalar read_file($config_file)), $conf_data);
+            $conf_data = Hash::Merge::merge( YAML::XS::Load(scalar File::Slurp::read_file($config_file)), $conf_data);
         } else {
             warn "Deploy Config Missing: $config_file" if $debug;
         }
@@ -76,6 +141,12 @@ sub _build_config{
     return $conf_data;
 }
 
+=attr log
+
+see L<Lecstor::Log>
+
+=cut
+
 has log => ( is => 'ro', isa => 'Lecstor::Log', lazy_build => 1 );
 
 sub _build_log{
@@ -83,28 +154,46 @@ sub _build_log{
     Lecstor::Log->new( action_ctrl => $self->model->action );
 }
 
-has template => ( is => 'ro', isa => 'Lecstor::Native::Component', lazy_build => 1 );
+=attr template
+
+see L<Lecstor::Native::Component::Template>
+
+=cut
+
+has template => ( is => 'ro', isa => 'Lecstor::App::Component', lazy_build => 1 );
 
 sub _build_template{
     my ($self) = @_;
-    Lecstor::Native::Component::Template->new(
-        processor => Template::AutoFilter->new({
-            INCLUDE_PATH => $self->template_include_paths,
-            LOAD_PLUGINS => [
-              Lecstor::Template::Plugins::Allow->new(@{$self->template_allowed_plugins}),
-              Template::Plugins->new(),
-            ],
-        }),
+    Lecstor::App::Component::Template->new(
+        templates => $self->template_include_paths,
+        plugins => $self->template_allowed_plugins,
     );
 }
+
+=attr template_include_paths
+
+paths to search for templates 
+
+default: ['root']
+
+=cut
 
 has template_include_paths => ( is => 'ro', isa => 'ArrayRef', lazy_build => 1 );
 
 sub _build_template_include_paths{ ['root'] }
 
+=attr template_allowed_plugins
+
+plugins to enable for template processor
+
+default: [qw! Date Table Dumper !]
+
+=cut
+
 has template_allowed_plugins => ( is => 'ro', isa => 'ArrayRef', lazy_build => 1 );
 
 sub _build_template_allowed_plugins{ [qw! Date Table Dumper !] }
+
 
 __PACKAGE__->meta->make_immutable;
 

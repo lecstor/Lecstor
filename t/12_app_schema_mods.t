@@ -22,7 +22,7 @@ fixtures_ok 'login'
 #use_ok('App::WithSchemaMods');
 use_ok('Test::AppBasic');
 
-use_ok('Lecstor::Model');
+use_ok('App::Model');
 use_ok('Lecstor::Lucy::Indexer');
 use_ok('Lecstor::Lucy::Searcher');
 use_ok('Lecstor::Model::Controller::Action');
@@ -41,6 +41,8 @@ use_ok('Test::AppBasic');
 my $valid = Lecstor::Valid->new;
 my $session_id = time;
 
+=pod 
+
 my %ctrls;
 
 $ctrls{person} = App::Model::Controller::Person->new(
@@ -54,23 +56,21 @@ foreach my $ctrl (qw! Collection Product Session !){
 
 $ctrls{action} = Lecstor::Model::Controller::Action->new(
     schema => Schema,
-    current_user => Lecstor::Model::Instance::User->new,
-    current_session_id => $session_id,
 );
 
 $ctrls{user} = Lecstor::Model::Controller::User->new(
     schema => Schema,
     validator => $valid,
-    action_ctrl => $ctrls{action},
     person_ctrl => $ctrls{person},
-    current_user => Lecstor::Model::Instance::User->new,
-    current_session_id => $session_id,
 );
+
+=cut
 
 my $lucy_index = tempdir( CLEANUP => 1);
 
-my $app = Lecstor::Model->new(
-    %ctrls,
+my $app = App::Model->new(
+    schema => Schema,
+    validator => $valid,
     product_indexer => Lecstor::Lucy::Indexer->new(
         index_path => $lucy_index,
         create => 1,

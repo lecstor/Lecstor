@@ -1,5 +1,6 @@
 package Lecstor::Catalyst::Controller::Account;
 use Moose;
+use Try::Tiny;
 use namespace::autoclean;
 
 # ABSTRACT: register an account
@@ -13,6 +14,7 @@ BEGIN { extends 'Catalyst::Controller' }
 
 sub setup :Chained('/') :PathPart('') :CaptureArgs(0){
     my ( $self, $c ) = @_;
+    $c->session;
     if ($c->user_exists){
         $c->lecstor->login($c->user->user_object);
     }
@@ -59,14 +61,20 @@ sub register :Chained('setup') :PathPart('register') :Args(0){
     my $action = delete $params->{action}; # name of submit button
 
     if ($action){
-        my $result = $app->model->user->register($params);
-        if ($result->isa('Lecstor::Error')){
-            $c->stash->{error} = $result;
-        } else {
+        try{
+            my $result = $app->model->user->register($params);
             $c->stash->{session}{user} = $result;
             $c->authenticate({ email => $params->{email}, password => $params->{password} });
             $app->login($result);
-        }
+        } catch {
+            my $err = $_;
+            die $err unless blessed $err && $err->isa('Lecstor::X');
+            $c->stash->{error} = $err->as_hash;
+            $app->log->action(
+                $app->session, 'register fail',
+                { error => $err->as_hash, params => $params }
+            );
+        };
     }
 
     delete $params->{password};
@@ -74,9 +82,9 @@ sub register :Chained('setup') :PathPart('register') :Args(0){
     $c->stash({
         template => 'account/register.tt',
         params => $params,
-        request => {
-            path_info => '/'.$c->req->path_info,
-        },
+#        request => {
+#            path_info => '/'.$c->req->path_info,
+#        },
 #        %{$app->request->stash},
 #        view => $app->response->view({ page => { title => 'Register' }}),
     });
@@ -106,20 +114,21 @@ sub login :Chained('setup') :PathPart('login') :Args(0){
                 $c->res->redirect( $uri );
                 return;
             } else {
-                $app->log_action('login fail', { params => $params, validation => 'catalyst authenticate' });
+                $app->log->action($app->session, 'login fail', { params => $params, validation => 'catalyst authenticate' });
                 $c->stash->{error} = $app->error({
                     error => 'The email address or password is incorrect.'
                 });
             }
         } else {
-            $app->log_action(
+            $app->log->action(
+                $app->session, 
                 'login fail',
                 { username => $params->{email}, errors => $v->error_fields, validation => 'user' }
             );
-            $c->stash->{error} = $app->error({
+            $c->stash->{error} = {
                 error_fields => $v->error_fields,
                 error => $v->errors_to_string,
-            });
+            };
         }
 
         delete $params->{password};
@@ -127,7 +136,7 @@ sub login :Chained('setup') :PathPart('login') :Args(0){
 
     $c->stash({
         template => 'account/login.tt',
-        view => $app->response->view({ page => { title => 'Log In' }}),
+#        view => $app->response->view({ page => { title => 'Log In' }}),
         params => $params,
     });
 

@@ -1,14 +1,8 @@
-package Lecstor::Catalyst::Controller::Root;
+package CatApp::Controller::Uri;
 use Moose;
 use namespace::autoclean;
 
 BEGIN { extends 'Catalyst::Controller' }
-
-#
-# Sets the actions in this controller to be registered with no prefix
-# so they function identically to actions created in MyApp.pm
-#
-__PACKAGE__->config(namespace => '');
 
 =head1 NAME
 
@@ -59,7 +53,7 @@ The root page (/)
 
 =cut
 
-sub index :Chained('full_page') :PathPart('') :Args(0){
+sub index :Chained('full_page') :PathPart('uri/test') :Args(0){
     my ( $self, $c ) = @_;
 
     my $app = $c->lecstor;

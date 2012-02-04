@@ -1,6 +1,7 @@
 package Lecstor::Model::Controller::User;
 use Moose;
 use Lecstor::Error;
+use Lecstor::X::Valid;
 
 # ABSTRACT: interface to user records
 

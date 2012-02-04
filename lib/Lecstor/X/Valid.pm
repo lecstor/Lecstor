@@ -7,7 +7,7 @@ extends 'Lecstor::X';
 has fields => (
     is => 'ro',
     isa => 'HashRef',
-    default => {{}}
+    default => sub {{}},
 );
 
 has validation => ( is => 'ro', isa => 'Str', required => 1 );

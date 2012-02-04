@@ -1,4 +1,4 @@
-package Lecstor::Native::Request;
+package Lecstor::WebApp::Context;
 use Moose;
 use MooseX::Aliases;
 

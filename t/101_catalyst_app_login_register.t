@@ -39,7 +39,7 @@ $mech->post_ok(
     }
 );
 $mech->content_like( qr!<h2>Register</h2>!, 'is register page' );
-$mech->content_like( qr/A valid email address is required/, 'invalid email' );
+$mech->content_like( qr/A valid email address is required/, 'invalid email' ) or diag($mech->content);
 
 #-----------------------
 $mech->post_ok(
@@ -77,8 +77,8 @@ $mech->post_ok(
         action => 'Sign In',
     }
 );
-$mech->content_like( qr!uri: "/"!, 'is home page' ) or dump_meta($mech);
-$mech->content_like( qr!Logged in as!, 'logged in' );
+$mech->content_like( qr!uri: "uri/test"!, 'uri ok' ) or dump_meta($mech);
+$mech->content_like( qr!Logged in as!, 'logged in' ) or diag($mech->content);
 
 #warn $mech->content;
 
