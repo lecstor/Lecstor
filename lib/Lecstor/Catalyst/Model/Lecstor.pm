@@ -30,7 +30,9 @@ sub build_per_context_instance {
     my $request = Lecstor::Catalyst::Component::Request->new({ request => $ctx->req });
     $ctx->stash->{request} = $request;
 
-    return Lecstor::Catalyst::WebApp->new(
+    my $webapp_class = $ctx->config->{'Model::Lecstor'}{WebApp}{class} || 'Lecstor::Catalyst::WebApp';
+
+    return $webapp_class->new(
         _app => $app,
         _request => Lecstor::WebApp::Context->new(
             request => $request,
