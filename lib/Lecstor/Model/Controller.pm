@@ -54,7 +54,8 @@ returns an arrayref of item objects.
 sub search{
     my ($self, @args) = @_;
     @args = $self->reconstruct_search_args(@args);
-    return $self->prefetch_single_related_rs->search(@args);
+    my $rs = $self->prefetch_single_related_rs->search(@args);
+    return wantarray ? $rs->all : $rs;
 }
 
 =method search_for_id

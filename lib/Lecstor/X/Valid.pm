@@ -12,6 +12,7 @@ has fields => (
 
 has validation => ( is => 'ro', isa => 'Str', required => 1 );
 
+# fields for as_hash
 sub _build_hash_fields{
     [qw!ident message fields validation!];
 }
