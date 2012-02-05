@@ -2,7 +2,7 @@
 use Plack::Builder;
 use Lecstor::Native;
 
-my $app = Lecstor::PSGI->new(
+my $app = Lecstor::Native->new(
     app_class => 'Lecstor::App',
     webapp_request_class => 'Lecstor::WebApp::Request',
 )->coderef;
