@@ -5,6 +5,7 @@ use namespace::autoclean;
 
 use Lecstor::Catalyst::WebApp;
 use Lecstor::Catalyst::Component::Session;
+use Lecstor::Catalyst::Component::Request;
 
 use Lecstor::WebApp::Context;
 
@@ -25,12 +26,14 @@ sub build_per_context_instance {
         sessionid => $ctx->sessionid,
         user => $user,
     );
-    $ctx->stash->{request} = $ctx->req;
+
+    my $request = Lecstor::Catalyst::Component::Request->new({ request => $ctx->req });
+    $ctx->stash->{request} = $request;
 
     return Lecstor::Catalyst::WebApp->new(
         _app => $app,
         _request => Lecstor::WebApp::Context->new(
-            request => $ctx->req,
+            request => $request,
             response => $ctx->res,
             session => $ctx->stash->{session},
             user => $user,

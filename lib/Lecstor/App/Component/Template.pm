@@ -1,5 +1,6 @@
 package Lecstor::App::Component::Template;
 use Moose;
+use Lecstor::X;
 
 extends 'Lecstor::App::Component';
 

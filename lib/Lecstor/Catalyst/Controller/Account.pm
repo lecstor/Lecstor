@@ -29,21 +29,17 @@ sub setup :Chained('/') :PathPart('') :CaptureArgs(0){
     });
 }
 
-=method restricted
+=method users_only
 
 =cut
 
-sub restricted :Chained('setup') :PathPart('') :CaptureArgs(0){
+sub users_only :Chained('setup') :PathPart('') :CaptureArgs(0){
     my ( $self, $c ) = @_;
 
     unless($c->user_exists){
         $c->response->body('400');
         $c->detach;
     }
-
-    $c->log->debug(
-        'Controller::Account->restricted user id: '. $c->user->user_object->id
-    ) if $c->debug;
 
 }
 

@@ -65,13 +65,6 @@ sub register_user{
     shift->model->user->register(@_);
 }
 
-sub visitor_add_to_jobs{
-    my ($self, $params) = @_;
-    my $job = $self->model->job->create($params);
-    $self->user->add_to_jobs($job) if $job;
-    return $job;
-}
-
 __PACKAGE__->meta->make_immutable;
 
 1;
