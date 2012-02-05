@@ -55,7 +55,7 @@ $mech->post_ok(
         action => 'Sign In',
     }
 );
-$mech->content_like( qr!uri: "uri/test"!, 'is home page' )
+$mech->content_like( qr!uri: "/uri/test"!, 'is home page' )
     or diag(get_view_meta($mech->content));
 $mech->content_like( qr!Logged in as!, 'logged in' );
 

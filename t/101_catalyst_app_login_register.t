@@ -77,7 +77,7 @@ $mech->post_ok(
         action => 'Sign In',
     }
 );
-$mech->content_like( qr!uri: "uri/test"!, 'uri ok' ) or dump_meta($mech);
+$mech->content_like( qr!uri: "/uri/test"!, 'uri ok' ) or dump_meta($mech);
 $mech->content_like( qr!Logged in as!, 'logged in' ) or diag($mech->content);
 
 #warn $mech->content;
